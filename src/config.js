@@ -70,6 +70,9 @@ const config = {
   // ─── GitHub 镜像（用于下载 IP 数据库） ───
   githubMirror: (process.env.GITHUB_MIRROR || '').replace(/\/+$/, ''),
 
+  // ─── ICP 备案号 ───
+  icpBeian: (process.env.ICP_BEIAN || '').trim(),
+
   // ─── 应用信息 ───
   app: {
     name: 'IP 归属地查询系统',
