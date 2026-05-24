@@ -137,11 +137,11 @@
         <div style="display:flex;justify-content:center;gap:40px;margin-top:16px;flex-wrap:wrap;">
           <div style="text-align:center;">
             <div style="font-size:36px;font-weight:700;color:#8b7dff;" id="dailyPV"></div>
-            <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:4px;">页面访问 PV</div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:4px;" data-i18n="stats.pvCount">页面访问 PV</div>
           </div>
           <div style="text-align:center;">
             <div style="font-size:36px;font-weight:700;color:#00c896;" id="dailyAPICount"></div>
-            <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:4px;">API 调用</div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:4px;" data-i18n="stats.apiCount">API 调用</div>
           </div>
         </div>
       </div>
@@ -189,6 +189,7 @@
 
 function $(id){ return document.getElementById(id); }
 function esc(s){ var d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+function __t(key) { return (window.I18N && window.I18N.t ? window.I18N.t(key) : null) || key; }
 
 // ── Chart.js 暗色主题 ──
 var darkTheme = {
@@ -251,12 +252,12 @@ async function loadStats(){
       labels = Object.keys(monthly);
       pvValues = labels.map(function(m){ return monthly[m].pv; });
       apiValues = labels.map(function(m){ return monthly[m].api; });
-      $('chartTitle').textContent = '📅 月度统计';
+      $('chartTitle').textContent = __t('stats.chartMonthly');
     } else {
       labels = daily.map(function(d){ return d.date; });
       pvValues = daily.map(function(d){ return d.pageviews; });
       apiValues = daily.map(function(d){ return d.api_calls; });
-      $('chartTitle').textContent = '📅 每日明细';
+      $('chartTitle').textContent = __t('stats.chartDaily');
     }
 
     var hasData = pvValues.some(function(v){ return v > 0; }) || apiValues.some(function(v){ return v > 0; });
@@ -270,9 +271,9 @@ async function loadStats(){
 
     if (currentRange === 'daily') {
       // 今日：直接显示数据，不用图表
-      $('chartTitle').textContent = '📅 今日数据';
+      $('chartTitle').textContent = __t('stats.tabToday');
       $('dailyInfo').style.display = 'block';
-      $('dailyDate').textContent = '日期: ' + labels[0];
+      $('dailyDate').textContent = __t('stats.datePrefix') + ': ' + labels[0];
       $('dailyPV').textContent = pvValues[0];
       $('dailyAPICount').textContent = apiValues[0];
     } else {
@@ -284,10 +285,10 @@ async function loadStats(){
     var breakdown = data.api_breakdown;
     var entries = Object.entries(breakdown).sort(function(a,b){ return b[1] - a[1]; });
     if (entries.length === 0) {
-      $('apiTable').innerHTML = '<div class="empty" style="display:block">暂无 API 调用记录</div>';
+      $('apiTable').innerHTML = '<div class="empty" style="display:block">' + __t('stats.noAPIRecords') + '</div>';
     } else {
       var maxVal = entries[0][1] || 1;
-      var h = '<table class="api-table"><thead><tr><th>接口</th><th style="text-align:right;">调用次数</th></tr></thead><tbody>';
+      var h = '<table class="api-table"><thead><tr><th>' + __t('stats.interface') + '</th><th style="text-align:right;">' + __t('stats.callCount') + '</th></tr></thead><tbody>';
       entries.forEach(function(e){
         var pct = Math.round(e[1] / maxVal * 100);
         h += '<tr>' +
@@ -301,7 +302,7 @@ async function loadStats(){
     }
   } catch(e){
     $('loading').style.display = 'none';
-    $('empty').textContent = '加载失败: ' + e.message;
+    $('empty').textContent = __t('stats.loadFailed') + ': ' + e.message;
     $('empty').style.display = 'block';
   }
 }
@@ -315,7 +316,7 @@ function renderChart(labels, pvData, apiData){
       labels: labels,
       datasets: [
         {
-          label: 'API 调用',
+          label: __t('stats.apiCount'),
           data: apiData,
           backgroundColor: darkTheme.apiBgColor,
           borderColor: darkTheme.apiColor,
@@ -325,7 +326,7 @@ function renderChart(labels, pvData, apiData){
           yAxisID: 'y1'
         },
         {
-          label: 'PV',
+          label: __t('stats.pvCount'),
           data: pvData,
           type: 'line',
           borderColor: darkTheme.pvColor,
@@ -378,7 +379,7 @@ function renderChart(labels, pvData, apiData){
           position: 'left',
           title: {
             display: true,
-            text: 'PV',
+            text: __t('stats.pvCount'),
             color: darkTheme.pvColor
           },
           ticks: { color: darkTheme.fontColor },
@@ -391,7 +392,7 @@ function renderChart(labels, pvData, apiData){
           position: 'right',
           title: {
             display: true,
-            text: 'API',
+            text: __t('stats.apiCount'),
             color: darkTheme.apiColor
           },
           ticks: { color: darkTheme.fontColor },
