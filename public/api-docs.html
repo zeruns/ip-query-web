@@ -66,10 +66,12 @@
       font-family: 'SF Mono','Fira Code','Consolas',monospace; font-size: 12px;
     }
     .example-row .url { color: #6c63ff; word-break: break-all; flex:1; min-width:0; }
+    .example-row a { color: #6c63ff; text-decoration: none; word-break: break-all; flex:1; min-width:0; }
+    .example-row a:hover { color: #b388ff; }
     .example-row .full-url { color: rgba(255,255,255,0.25); font-size: 11px; word-break: break-all; display: none; }
     .example-row .full-url.show { display: inline; }
     .btn-test {
-      flex-shrink: 0; padding: 4px 12px; border: 1px solid rgba(108,99,255,0.3); border-radius: 6px;
+      flex-shrink: 0; margin-left: auto; padding: 4px 12px; border: 1px solid rgba(108,99,255,0.3); border-radius: 6px;
       background: transparent; color: #8b7dff; font-size: 11px; cursor: pointer; transition: all 0.2s;
       font-family: inherit;
     }
@@ -79,9 +81,10 @@
     .btn-test.err { border-color: rgba(255,50,50,0.3); color: #ff6b6b; background: rgba(255,50,50,0.1); }
 
     .test-result {
-      display: none; margin-top: 4px; border-radius: 6px;
+      display: none; width: 100%; margin-top: 4px; border-radius: 6px;
       font-family: 'SF Mono','Fira Code','Consolas',monospace; font-size: 11px; line-height: 1.6;
       word-break: break-all; max-height: 320px; overflow: auto;
+      text-align: right;
     }
     .test-result.show { display: block; }
     .test-result.success { background: rgba(0,200,150,0.06); border: 1px solid rgba(0,200,150,0.1); }
@@ -319,9 +322,8 @@ function escHtml(str) { const d = document.createElement('div'); d.textContent =
     var path = el.textContent.trim();
     var a = document.createElement('a');
     a.href = origin + path;
-    a.textContent = path;
+    a.textContent = origin + path;
     a.style.color = '#6c63ff';
-    a.style.textDecoration = 'none';
     a.target = '_blank';
     a.rel = 'noopener';
     a.title = origin + path;
