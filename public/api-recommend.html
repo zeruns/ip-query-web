@@ -364,7 +364,7 @@ function initGrid() {
         '<span class="api-card-status status-idle" id="status-' + src.id + '">待查询</span>' +
       '</div>' +
       '<div class="api-card-body" id="body-' + src.id + '">' +
-        '<div class="api-card-doc">📖 ' + esc(src.doc) + '</div>' +
+        '<div class="api-card-doc">📖 ' + esc((window.I18N && I18N.t('apiDesc.' + src.id)) || src.doc) + '</div>' +
         '<div class="api-card-link"><a href="' + esc(src.link) + '" target="_blank" rel="noopener">🔗 访问官网</a></div>' +
       '</div>';
     grid.appendChild(card);

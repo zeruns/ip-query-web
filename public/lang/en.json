@@ -40,7 +40,10 @@
     "subtitle": "All endpoints support JSON and plain text (.txt suffix) formats",
     "sectionRequest": "📎 Example Request",
     "btnTest": "▶ Test",
-    "btnTesting": "⏳ Testing..."
+    "btnTesting": "⏳ Testing...",
+    "paramIpOrDomain": "{IP or Domain}",
+    "paramIp": "{IP}",
+    "paramDomain": "{Domain}"
   },
   "apiRecommend": {
     "title": "🔗 Third-party IP API Comparison",
@@ -128,9 +131,14 @@
     "queryFailed": "Query failed"
   },
   "apiDesc": {
-    "ipip": "Free query API from IPIP.NET, a commercial IP database vendor. No registration required. Returns plain text (current IP + location). Only supports querying the visitor's own IP; does not support querying specified IPs. Added UA header requirement in 2024.",
-    "ipapi": "No registration required, free to use. Limit: 45 req/min. Free tier HTTP only (HTTPS requires paid plan). Supports lang=zh-CN. Returns JSON/XML/CSV formats.",
-    "ipsb": "No registration, no explicit rate limit. Supports IPv4/IPv6. Returns JSON format. Accessible from China.",
-    "geojsio": "Open source and free, no registration required. Supports IPv4/IPv6. Returns JSON format."
+    "ipip": "Free lookup API from IPIP.NET, a commercial IP database vendor. No registration required. Returns plain text (current IP + location). Only supports visitor's own IP query; UA header required since 2024.",
+    "ip-api": "No registration, free. Limit: 45 req/min. Free tier HTTP only. Supports lang=zh-CN. Returns JSON/XML/CSV.",
+    "ip-sb": "No registration, no explicit rate limit. Supports IPv4/IPv6. Returns JSON. Accessible from China.",
+    "geojsio": "Free, no registration, no rate limit. Returns JSON/JSONP with ASN/coordinates/timezone/continent. Supports IPv4/IPv6.",
+    "ipapi-is": "Free HTTPS API focused on security (proxy/VPN/TOR/datacenter detection). Returns JSON with ASN/company/abuse info.",
+    "iplocate-io": "Free HTTPS API, no registration. Returns JSON with detailed geo/ASN/coordinates/timezone. Supports IPv4/IPv6.",
+    "freeipapi": "Free HTTPS API, no registration, no rate limit. Returns JSON with country/city/ISP/coordinates/timezone/ASN. Supports IPv4/IPv6.",
+    "ipinfo": "Free tier 50,000 req/day. Token optional. Returns detailed geo/ASN/ISP with coordinates and timezone.",
+    "local": "QQWry IP database (qqwry.ipdb). Local lookup, no rate limit. Supports IPv4/IPv6. No IP data sent to third parties."
   }
 }

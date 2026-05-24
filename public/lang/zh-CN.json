@@ -40,7 +40,10 @@
     "subtitle": "所有接口支持 JSON 和纯文本（后缀 .txt）双格式",
     "sectionRequest": "📎 请求示例",
     "btnTest": "▶ 测试",
-    "btnTesting": "⏳ 测试中..."
+    "btnTesting": "⏳ 测试中...",
+    "paramIpOrDomain": "{ip或域名}",
+    "paramIp": "{ip}",
+    "paramDomain": "{域名}"
   },
   "apiRecommend": {
     "title": "🔗 第三方 IP 查询 API 推荐",
@@ -129,8 +132,13 @@
   },
   "apiDesc": {
     "ipip": "IPIP.NET 商业 IP 数据库厂商提供的免费查询接口，无需注册，返回纯文本（当前 IP + 地理位置）。仅支持查询访问者自身 IP，不支持查询指定 IP 地址。2024年新增限制需传 UA Header。",
-    "ipapi": "无需注册，免费调用。限制：45次/分钟。免费版仅支持 HTTP（HTTPS 需付费）。支持语言参数 lang=zh-CN。返回 JSON/XML/CSV 格式。",
-    "ipsb": "无需注册，无明确频率限制。支持 IPv4/IPv6。返回 JSON 格式。国内访问可用。",
-    "geojsio": "开源免费，无需注册。支持 IPv4/IPv6。返回 JSON 格式。"
+    "ip-api": "无需注册，免费调用。限制：45次/分钟。免费版仅支持 HTTP（HTTPS 需付费）。支持语言参数 lang=zh-CN。返回 JSON/XML/CSV 格式。",
+    "ip-sb": "无需注册，无明确频率限制。支持 IPv4/IPv6。返回 JSON 格式。国内访问可用。",
+    "geojsio": "免费，无需注册，无明确频率限制。返回 JSON/JSONP 格式，含 ASN/坐标/时区/大洲。支持 IPv4/IPv6。",
+    "ipapi-is": "免费 HTTPS 接口，侧重网络安全检测（代理/VPN/TOR/数据中心检测）。返回 JSON 格式，含 ASN/公司/滥用信息。",
+    "iplocate-io": "免费 HTTPS 接口，无需注册。返回 JSON 格式，含详细地理位置/ASN/坐标/时区/隐私检测。支持 IPv4/IPv6。",
+    "freeipapi": "免费 HTTPS 接口，无需注册，无明确频率限制。返回 JSON 格式，含国家/城市/ISP/坐标/时区/ASN。支持 IPv4/IPv6。",
+    "ipinfo": "免费用户每日 50,000 次。需注册 Token（可选）。返回详细地理/ASN/运营商信息，含坐标和时区。",
+    "local": "基于纯真 IP 数据库 (qqwry.ipdb)，本地查询无频率限制。支持 IPv4/IPv6，不暴露公网 IP 给第三方。"
   }
 }
