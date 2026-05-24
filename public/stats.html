@@ -34,27 +34,29 @@
     h1 { text-align: center; font-size: 24px; margin-bottom: 6px; background: linear-gradient(90deg, #6c63ff, #b388ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .subtitle { text-align: center; color: rgba(255,255,255,0.4); font-size: 13px; margin-bottom: 28px; }
 
-    .metrics-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+    .metrics-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
     .metric-card {
-      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 14px; padding: 18px; text-align: center;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px; padding: 22px 18px; text-align: center;
+      transition: border-color 0.3s, background 0.3s;
     }
+    .metric-card:hover { border-color: rgba(255,255,255,0.12); background: rgba(255,255,255,0.06); }
     .metric-value { font-size: 26px; font-weight: 700; line-height: 1.2; }
     .metric-label { color: rgba(255,255,255,0.35); font-size: 12px; margin-top: 4px; letter-spacing: 1px; }
     .metric-card.pv .metric-value { color: #8b7dff; }
     .metric-card.api .metric-value { color: #00c896; }
 
-    .tab-row { display: flex; gap: 6px; margin-bottom: 20px; justify-content: center; }
+    .tab-row { display: flex; gap: 8px; margin-bottom: 24px; justify-content: center; }
     .tab-btn {
-      padding: 8px 20px; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;
-      background: transparent; color: rgba(255,255,255,0.5); font-size: 14px; cursor: pointer; transition: all 0.2s;
+      padding: 10px 24px; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px;
+      background: rgba(255,255,255,0.03); color: rgba(255,255,255,0.45); font-size: 14px; cursor: pointer; transition: all 0.25s;
     }
-    .tab-btn:hover { color: #fff; border-color: rgba(255,255,255,0.2); }
-    .tab-btn.active { color: #8b7dff; border-color: rgba(108,99,255,0.4); background: rgba(108,99,255,0.1); font-weight: 600; }
+    .tab-btn:hover { color: #fff; border-color: rgba(255,255,255,0.18); background: rgba(255,255,255,0.06); }
+    .tab-btn.active { color: #8b7dff; border-color: rgba(108,99,255,0.35); background: rgba(108,99,255,0.1); font-weight: 600; }
 
     .card {
-      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 16px; padding: 24px; margin-bottom: 18px;
+      background: rgba(255,255,255,0.035); border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 18px; padding: 24px; margin-bottom: 20px;
     }
     .card-title { color: rgba(255,255,255,0.5); font-size: 12px; letter-spacing: 1px; margin-bottom: 16px; }
 
@@ -120,9 +122,25 @@
   </div>
 
   <div class="card">
-    <div class="card-title" id="chartTitle">📅 每日明细</div>
-    <div class="loading" id="loading">加载中...</div>
+    <div class="card-title" id="chartTitle">📅 点击上方标签查看数据</div>
+    <div class="empty" id="placeholder" style="display:block;">👆 点击「今日」「7天」「30天」「1年」加载数据</div>
+    <div class="loading" id="loading" style="display:none">加载中...</div>
     <div class="empty" id="empty" style="display:none">暂无数据</div>
+    <div class="daily-info" id="dailyInfo" style="display:none">
+      <div style="text-align:center;padding:10px 0 20px;">
+        <div style="font-size:16px;color:rgba(255,255,255,0.5);" id="dailyDate"></div>
+        <div style="display:flex;justify-content:center;gap:40px;margin-top:16px;flex-wrap:wrap;">
+          <div style="text-align:center;">
+            <div style="font-size:36px;font-weight:700;color:#8b7dff;" id="dailyPV"></div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:4px;">页面访问 PV</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:36px;font-weight:700;color:#00c896;" id="dailyAPICount"></div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:4px;">API 调用</div>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="chart-wrap" id="chartWrap" style="display:none">
       <canvas id="statsChart"></canvas>
     </div>
@@ -188,8 +206,10 @@ tabs.forEach(function(btn){
 });
 
 async function loadStats(){
+  $('placeholder').style.display = 'none';
   $('loading').style.display = 'block';
   $('empty').style.display = 'none';
+  $('dailyInfo').style.display = 'none';
   $('chartWrap').style.display = 'none';
   if (chart) { chart.destroy(); chart = null; }
 
@@ -232,11 +252,21 @@ async function loadStats(){
 
     var hasData = pvValues.some(function(v){ return v > 0; }) || apiValues.some(function(v){ return v > 0; });
 
+    $('loading').style.display = 'none';
+
     if (!hasData) {
-      $('loading').style.display = 'none';
       $('empty').style.display = 'block';
+      return;
+    }
+
+    if (currentRange === 'daily') {
+      // 今日：直接显示数据，不用图表
+      $('chartTitle').textContent = '📅 今日数据';
+      $('dailyInfo').style.display = 'block';
+      $('dailyDate').textContent = '日期: ' + labels[0];
+      $('dailyPV').textContent = pvValues[0];
+      $('dailyAPICount').textContent = apiValues[0];
     } else {
-      $('loading').style.display = 'none';
       $('chartWrap').style.display = 'block';
       renderChart(labels, pvValues, apiValues);
     }
@@ -363,8 +393,6 @@ function renderChart(labels, pvData, apiData){
     }
   });
 }
-
-loadStats();
 </script>
 </body>
 </html>
