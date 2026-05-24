@@ -6,13 +6,9 @@
   <title>IP归属地查询 | 本机IP | 我的IP</title>
   <meta name="description" content="在线IP归属地查询工具，支持IPv4和IPv6地址查询、域名解析、本机公网IP获取。基于纯真IP数据库，快速准确查询IP地理位置、运营商信息。">
   <meta name="keywords" content="IP查询,IP归属地,本机IP,我的IP,IP地址查询,公网IP,IPv4查询,IPv6查询,域名解析,地理位置查询,纯真IP库">
-  <meta name="seo-title" content="IP归属地查询 | 本机IP | 我的IP">
-  <meta name="seo-description" content="在线IP归属地查询工具，支持IPv4和IPv6地址查询、域名解析、本机公网IP获取。基于纯真IP数据库，快速准确查询IP地理位置、运营商信息。">
-  <meta name="seo-keywords" content="IP查询,IP归属地,本机IP,我的IP,IP地址查询,公网IP,IPv4查询,IPv6查询,域名解析,地理位置查询,纯真IP库">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="">
-  <meta name="site-url" content="https://ip-query.zeruns.com">
-  <meta name="beian" content="粤ICP备xxxxx号">
+  <script src="/config.js"></script>
   <link rel="icon" type="image/png" href="/favicon.png">
   <link rel="shortcut icon" href="/favicon.ico">
   <style>
@@ -245,16 +241,10 @@
 <script>
 // 从 meta 标签读取网站域名，设置 canonical 和 JSON-LD
 (function(){
-  var siteUrl = document.querySelector('meta[name="site-url"]')?.content || location.origin;
+  var cfg = window.SITE_CONFIG || {};
+  var siteUrl = cfg.siteURL || location.origin;
   var canonical = document.querySelector('link[rel="canonical"]');
   if (canonical) canonical.href = siteUrl + '/';
-  // SEO 覆写
-  var st = document.querySelector('meta[name="seo-title"]')?.content;
-  if (st) document.title = st;
-  var sd = document.querySelector('meta[name="seo-description"]')?.content;
-  if (sd) { var m = document.querySelector('meta[name="description"]'); if(m) m.content = sd; }
-  var sk = document.querySelector('meta[name="seo-keywords"]')?.content;
-  if (sk) { var m = document.querySelector('meta[name="keywords"]'); if(m) m.content = sk; }
   // JSON-LD
   var ld = document.getElementById('site-ldjson');
   if (ld) ld.textContent = JSON.stringify({
@@ -495,10 +485,10 @@ function toggleDetail(idx, entryEl) {
     .then(function(r){ return r.text(); })
     .then(function(html){
       document.getElementById('footer').innerHTML = html;
-      var beian = document.querySelector('meta[name="beian"]')?.content;
+      var beian = (window.SITE_CONFIG || {}).icpBeian;
       if (beian) {
         var el = document.getElementById('footer');
-        el.innerHTML += '<br><a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener" style="color:rgba(255,255,255,0.12);font-size:11px;">' + beian + '</a>';
+        el.innerHTML += '<div style="text-align:center;margin-top:4px;"><a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener" style="color:rgba(255,255,255,0.12);font-size:11px;">' + beian + '</a></div>';
       }
     });
 })();

@@ -6,13 +6,9 @@
   <title>API文档 - IP归属地查询 | 本机IP | 我的IP</title>
   <meta name="description" content="纯真IP库在线查询系统的API接口文档，支持IP归属地查询、域名解析、IPv4/IPv6、本机公网IP获取，提供JSON和TXT双格式输出。">
   <meta name="keywords" content="IP查询API,IP归属地API,本机IP接口,公网IP接口,域名解析API,地理位置API">
-  <meta name="seo-title" content="API文档 - IP归属地查询 | 本机IP | 我的IP">
-  <meta name="seo-description" content="纯真IP库在线查询系统的API接口文档，支持IP归属地查询、域名解析、IPv4/IPv6、本机公网IP获取，提供JSON和TXT双格式输出。">
-  <meta name="seo-keywords" content="IP查询API,IP归属地API,本机IP接口,公网IP接口,域名解析API,地理位置API">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="">
-  <meta name="site-url" content="https://ip-query.zeruns.com">
-  <meta name="beian" content="粤ICP备xxxxx号">
+  <script src="/config.js"></script>
   <link rel="icon" type="image/png" href="/favicon.png">
   <link rel="shortcut icon" href="/favicon.ico">
   <style>
@@ -297,15 +293,10 @@ function escHtml(str) { const d = document.createElement('div'); d.textContent =
 </script>
 <script>
 (function(){
-  var siteUrl = document.querySelector('meta[name="site-url"]')?.content || location.origin;
+  var cfg = window.SITE_CONFIG || {};
+  var siteUrl = cfg.siteURL || location.origin;
   var canonical = document.querySelector('link[rel="canonical"]');
   if (canonical) canonical.href = siteUrl + location.pathname;
-  var st = document.querySelector('meta[name="seo-title"]')?.content;
-  if (st) document.title = st;
-  var sd = document.querySelector('meta[name="seo-description"]')?.content;
-  if (sd) { var m = document.querySelector('meta[name="description"]'); if(m) m.content = sd; }
-  var sk = document.querySelector('meta[name="seo-keywords"]')?.content;
-  if (sk) { var m = document.querySelector('meta[name="keywords"]'); if(m) m.content = sk; }
 
   var path = location.pathname;
   var activeNav = 'home';
@@ -325,10 +316,10 @@ function escHtml(str) { const d = document.createElement('div'); d.textContent =
     .then(function(r){ return r.text(); })
     .then(function(html){
       document.getElementById('footer').innerHTML = html;
-      var beian = document.querySelector('meta[name="beian"]')?.content;
+      var beian = (window.SITE_CONFIG || {}).icpBeian;
       if (beian) {
         var el = document.getElementById('footer');
-        el.innerHTML += '<br><a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener" style="color:rgba(255,255,255,0.12);font-size:11px;">' + beian + '</a>';
+        el.innerHTML += '<div style="text-align:center;margin-top:4px;"><a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener" style="color:rgba(255,255,255,0.12);font-size:11px;">' + beian + '</a></div>';
       }
     });
 })();

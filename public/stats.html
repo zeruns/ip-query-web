@@ -6,13 +6,9 @@
   <title>网站统计 - IP归属地查询</title>
   <meta name="description" content="IP归属地查询系统网站统计页，查看页面访问量和API调用次数。">
   <meta name="keywords" content="网站统计,PV,API调用统计">
-  <meta name="seo-title" content="网站统计 - IP归属地查询">
-  <meta name="seo-description" content="IP归属地查询系统网站统计页，查看页面访问量和API调用次数。">
-  <meta name="seo-keywords" content="网站统计,PV,API调用统计">
   <meta name="robots" content="noindex, nofollow">
-  <meta name="site-url" content="https://ip-query.zeruns.com">
   <link rel="canonical" href="">
-  <meta name="beian" content="粤ICP备xxxxx号">
+  <script src="/config.js"></script>
   <link rel="icon" type="image/png" href="/favicon.png">
   <link rel="shortcut icon" href="/favicon.ico">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -165,15 +161,10 @@
 <script>
 // ── 组件加载 ──
 (function(){
-  var siteUrl = document.querySelector('meta[name="site-url"]')?.content || location.origin;
+  var cfg = window.SITE_CONFIG || {};
+  var siteUrl = cfg.siteURL || location.origin;
   var canonical = document.querySelector('link[rel="canonical"]');
   if (canonical) canonical.href = siteUrl + location.pathname;
-  var st = document.querySelector('meta[name="seo-title"]')?.content;
-  if (st) document.title = st;
-  var sd = document.querySelector('meta[name="seo-description"]')?.content;
-  if (sd) { var m = document.querySelector('meta[name="description"]'); if(m) m.content = sd; }
-  var sk = document.querySelector('meta[name="seo-keywords"]')?.content;
-  if (sk) { var m = document.querySelector('meta[name="keywords"]'); if(m) m.content = sk; }
 
   var path = location.pathname;
   var activeNav = 'home';
@@ -193,10 +184,10 @@
     .then(function(r){ return r.text(); })
     .then(function(html){
       document.getElementById('footer').innerHTML = html;
-      var beian = document.querySelector('meta[name="beian"]')?.content;
+      var beian = (window.SITE_CONFIG || {}).icpBeian;
       if (beian) {
         var el = document.getElementById('footer');
-        el.innerHTML += '<br><a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener" style="color:rgba(255,255,255,0.12);font-size:11px;">' + beian + '</a>';
+        el.innerHTML += '<div style="text-align:center;margin-top:4px;"><a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener" style="color:rgba(255,255,255,0.12);font-size:11px;">' + beian + '</a></div>';
       }
     });
 })();
