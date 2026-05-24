@@ -1,0 +1,22 @@
+version: "3.8"
+
+services:
+  ip-query-web:
+    build: .
+    image: ip-query-web:latest
+    container_name: ip-query-web
+    restart: unless-stopped
+    ports:
+      - "6688:6688"
+    volumes:
+      # IP 数据库文件持久化（更新后不丢失）
+      - ./data:/app/data
+      # 环境变量配置（可选）
+      - ./.env:/app/.env:ro
+    environment:
+      # 以下变量可写在这里，也可通过 .env 文件设置
+      - PORT=6688
+      - HOST=::
+      - TZ=Asia/Shanghai
+    # 以下与 start.sh 配合，自动加载 .env
+    # 如果不想用 .env 文件，直接在 environment 中设置即可

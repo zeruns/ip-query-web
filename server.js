@@ -1,0 +1,640 @@
+/**
+ * 纯真IP库在线查询系统 - Express 服务器
+ *
+ * 模块化架构，集成 IP 库查询 + 自动更新
+ * 所有 API 支持 JSON 和纯文本双格式
+ */
+
+const express = require('express');
+const compression = require('compression');
+const path = require('path');
+const http = require('http');
+const https = require('https');
+const fs = require('fs');
+const net = require('net');
+const rateLimit = require('express-rate-limit');
+
+// ──────────── 模块引入 ────────────
+const config = require('./src/config');
+const ipdb = require('./src/ipdb');
+const updater = require('./src/updater');
+const { init: initCC, ccProtection, getCCStatus, getRateLimitKey } = require('./src/ccProtection');
+const stats = require('./src/stats');
+
+// ──────────── 配置 ────────────
+const app = express();
+
+// 信任代理（Nginx 反代 / CDN 场景必须）
+// 设置为 1 信任最近一级代理，设置为 true 信任所有代理
+app.set('trust proxy', 1);
+
+const PORT = config.port;
+const HOST = config.host;
+
+// ──────────── 限流配置 ────────────
+
+// 限流 key 生成器 → 复用 getClientIP，确保 CDN 头优先
+const rateLimitKey = (req) => getClientIP(req);
+
+// 初始化 CC 防护
+initCC(config.cc);
+
+// 每个IP的速率限制
+const limiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: config.rateLimit.max,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, error: `请求过于频繁，请稍后再试 (限流: ${config.rateLimit.max}次/分钟/IP)` },
+  keyGenerator: rateLimitKey
+});
+
+// 域名解析接口限流（DNS查询耗时长，限制更严格）
+const dnsLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: config.rateLimit.dns,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, error: `域名解析请求过于频繁，请稍后再试 (限流: ${config.rateLimit.dns}次/分钟/IP)` },
+  keyGenerator: rateLimitKey
+});
+
+// 安全头中间件
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Referrer-Policy', 'same-origin');
+  next();
+});
+
+// ──────────── 中间件 ────────────
+
+// CC 防护（纯 Node 实现，必须放在最前面）
+app.use(ccProtection);
+
+// 压缩中间件（在静态文件之前）
+app.use(compression());
+
+// CORS
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  if (req.method === 'OPTIONS') return res.sendStatus(204);
+  next();
+});
+
+// 统计中间件（记录 PV 和 API 调用）
+app.use(stats.trackingMiddleware);
+
+// 请求日志（简化）
+app.use((req, res, next) => {
+  const start = Date.now();
+  res.on('finish', () => {
+    const ms = Date.now() - start;
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl} ${res.statusCode} ${ms}ms`);
+  });
+  next();
+});
+
+// JSON 解析
+app.use(express.json());
+
+// 静态文件
+app.use(express.static(path.join(__dirname, 'public')));
+
+// ──────────── 工具函数 ────────────
+
+/**
+ * 从请求头中获取访问者真实 IP
+ * 
+ * 优先级（从高到低）：
+ *   1. CDN 专用头: CF-Connecting-IP (Cloudflare), True-Client-IP (Cloudflare/阿里云),
+ *      X-Real-IP (Nginx), Ali-CDN-Real-IP (阿里云), X-Forwarded-For (通用)
+ *   2. req.ip (Express 根据 trust proxy 解析)
+ *   3. req.socket.remoteAddress (直连)
+ * 
+ * Nginx 反代需配置:
+ *   proxy_set_header X-Real-IP $remote_addr;
+ *   proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+ * 
+ * Cloudflare CDN 需在 Nginx 中:
+ *   server { real_ip_header CF-Connecting-IP; }
+ */
+function getClientIP(req) {
+  // CDN 专用头（优先）
+  const cdnHeaders = [
+    'cf-connecting-ip',      // Cloudflare
+    'true-client-ip',        // Cloudflare / 阿里云 / Google Cloud
+    'ali-cdn-real-ip',       // 阿里云 CDN
+    'x-real-ip',             // Nginx
+    'x-forwarded-for',       // 通用（取第一个）
+  ];
+  for (const header of cdnHeaders) {
+    const value = req.headers[header];
+    if (value) {
+      if (header === 'x-forwarded-for') {
+        // X-Forwarded-For: client, proxy1, proxy2 → 取第一个
+        const firstIP = value.split(',')[0].trim();
+        if (firstIP) return firstIP;
+      }
+      return value.trim();
+    }
+  }
+  // Express req.ip（受 trust proxy 设置影响）
+  return req.ip || req.socket.remoteAddress;
+}
+
+/**
+ * 通过外部服务获取公网 IP
+ * 从多个可信源获取，以防某个服务挂掉
+ */
+function fetchPublicIP() {
+  return new Promise((resolve, reject) => {
+    const sources = config.publicIPSources;
+    let done = false;
+    sources.forEach(url => {
+      if (done) return;
+      const mod = url.startsWith('https') ? require('https') : http;
+      mod.get(url, res => {
+        let data = '';
+        res.on('data', c => data += c);
+        res.on('end', () => {
+          if (!done) {
+            done = true;
+            resolve(data.trim());
+          }
+        });
+      }).on('error', () => {});
+    });
+    setTimeout(() => {
+      if (!done) {
+        done = true;
+        reject(new Error('获取公网IP超时'));
+      }
+    }, 15000);
+  });
+}
+
+/**
+ * 根据请求判断是否期望纯文本响应
+ * 逻辑：如果 URL 以 .txt 结尾则强制纯文本；
+ *       如果查询参数 ?format=txt 则强制纯文本；
+ *       如果查询参数 ?format=json 则强制 JSON；
+ *       否则根据 Accept 头判断
+ */
+function wantsText(req) {
+  if (req.path.endsWith('.txt')) return true;
+  const format = req.query.format;
+  if (format === 'txt') return true;
+  if (format === 'json') return false;
+  const accept = req.headers['accept'] || '';
+  return accept.includes('text/plain') && !accept.includes('application/json');
+}
+
+/**
+ * 统一响应包装：
+ *   JSON 模式：调用 jsonFn(req) 获取对象，res.json(obj)
+ *   纯文本模式：调用 txtFn(req) 获取字符串，res.type('text/plain; charset=utf-8').send(str)
+ */
+function respond(req, res, jsonFn, txtFn) {
+  if (wantsText(req)) {
+    res.type('text/plain; charset=utf-8');
+    try {
+      const result = txtFn(req);
+      if (result && typeof result.then === 'function') {
+        result.then(str => res.send(str)).catch(err => res.status(500).send(`error: ${err.message}`));
+      } else {
+        res.send(result);
+      }
+    } catch (e) {
+      res.status(500).send(`error: ${e.message}`);
+    }
+  } else {
+    try {
+      const result = jsonFn(req);
+      if (result && typeof result.then === 'function') {
+        result.then(obj => res.json(obj)).catch(err => res.json({ success: false, error: err.message }));
+      } else {
+        res.json(result);
+      }
+    } catch (e) {
+      res.json({ success: false, error: e.message });
+    }
+  }
+}
+
+// ──────────── API 路由 ────────────
+
+// ── 1. GET /api/myip — 返回访问者公网 IP ──
+app.get('/api/myip', limiter, (req, res) => {
+  respond(req, res,
+    // JSON
+    () => fetchPublicIP().then(ip => ({ success: true, ip })),
+    // TXT
+    () => fetchPublicIP()
+  );
+});
+
+app.get('/api/myip.txt', limiter, (req, res) => {
+  res.type('text/plain; charset=utf-8');
+  fetchPublicIP()
+    .then(ip => res.send(ip))
+    .catch(err => res.status(500).send(`error: ${err.message}`));
+});
+
+// ── 2. GET /api/location?q={ip} — 输入 IP 查地理位置 ──
+app.get('/api/location', limiter, (req, res) => {
+  const q = (req.query.q || '').trim();
+  if (!q) {
+    return res.json({ success: false, error: '请输入IP地址' });
+  }
+  if (!net.isIP(q)) {
+    return res.json({ success: false, error: '请输入有效的IP地址' });
+  }
+
+  respond(req, res,
+    // JSON
+    () => {
+      const r = ipdb.query(q);
+      return r;
+    },
+    // TXT
+    () => {
+      const r = ipdb.query(q);
+      if (!r.success) return `错误: ${r.error}`;
+      return ipdb.formatLocationText(r);
+    }
+  );
+});
+
+app.get('/api/location.txt', limiter, (req, res) => {
+  res.type('text/plain; charset=utf-8');
+  const q = (req.query.q || '').trim();
+  if (!q || !net.isIP(q)) {
+    return res.status(400).send('error: 请输入有效的IP地址');
+  }
+  const r = ipdb.query(q);
+  if (!r.success) return res.status(404).send(`error: ${r.error}`);
+  res.send(ipdb.formatLocationTextSimple(r));
+});
+
+// ── 3. GET /api/mylocation — 获取访问者地理位置 ──
+// 返回服务端看到的请求来源 IP 及其地理位置
+// 注意：通过 Tailscale/代理访问时，看到的是隧道入口 IP 而非客户端公网 IP
+app.get('/api/mylocation', limiter, (req, res) => {
+  const clientIP = getClientIP(req);
+  respond(req, res,
+    // JSON
+    () => {
+      return ipdb.query(clientIP);
+    },
+    // TXT
+    () => {
+      const r = ipdb.query(clientIP);
+      if (!r.success) return `错误: ${r.error}`;
+      return `你的访问来源 IP: ${clientIP}\n${ipdb.formatLocationText(r)}`;
+    }
+  );
+});
+
+app.get('/api/mylocation.txt', limiter, (req, res) => {
+  res.type('text/plain; charset=utf-8');
+  const clientIP = getClientIP(req);
+  const r = ipdb.query(clientIP);
+  if (!r.success) return res.status(404).send(`error: ${r.error}`);
+  res.send(ipdb.formatLocationTextSimple(r));
+});
+
+// ── 4. GET /api/resolve4?q={domain} — 域名解析 IPv4 ──
+app.get('/api/resolve4', dnsLimiter, (req, res) => {
+  const q = (req.query.q || '').trim();
+  if (!q) {
+    return res.json({ success: false, error: '请输入域名' });
+  }
+
+  respond(req, res,
+    // JSON
+    () => ipdb.resolveIPv4(q).then(addrs => {
+      if (!addrs || addrs.length === 0) {
+        return { success: false, error: '该域名无 IPv4 记录', domain: q };
+      }
+      return {
+        success: true,
+        domain: q,
+        type: 'IPv4',
+        count: addrs.length,
+        ips: addrs
+      };
+    }).catch(err => ({
+      success: false,
+      error: `解析失败: ${err.message}`,
+      domain: q
+    })),
+    // TXT
+    () => ipdb.resolveIPv4(q).then(addrs => {
+      if (!addrs || addrs.length === 0) {
+        throw new Error('该域名无 IPv4 记录');
+      }
+      return addrs[0];
+    })
+  );
+});
+
+app.get('/api/resolve4.txt', dnsLimiter, (req, res) => {
+  res.type('text/plain; charset=utf-8');
+  const q = (req.query.q || '').trim();
+  if (!q) return res.status(400).send('error: 请输入域名');
+  ipdb.resolveIPv4(q)
+    .then(addrs => {
+      if (!addrs || addrs.length === 0) return res.status(404).send('error: 该域名无 IPv4 记录');
+      res.send(addrs[0]);
+    })
+    .catch(err => res.status(404).send(`error: ${err.message}`));
+});
+
+// ── 5. GET /api/resolve6?q={domain} — 域名解析 IPv6 ──
+app.get('/api/resolve6', dnsLimiter, (req, res) => {
+  const q = (req.query.q || '').trim();
+  if (!q) {
+    return res.json({ success: false, error: '请输入域名' });
+  }
+
+  respond(req, res,
+    // JSON
+    () => ipdb.resolveIPv6(q).then(addrs => {
+      if (!addrs || addrs.length === 0) {
+        return { success: false, error: '该域名无 IPv6 记录', domain: q };
+      }
+      return {
+        success: true,
+        domain: q,
+        type: 'IPv6',
+        count: addrs.length,
+        ips: addrs
+      };
+    }).catch(err => ({
+      success: false,
+      error: `解析失败: ${err.message}`,
+      domain: q
+    })),
+    // TXT
+    () => ipdb.resolveIPv6(q).then(addrs => {
+      if (!addrs || addrs.length === 0) {
+        throw new Error('该域名无 IPv6 记录');
+      }
+      return addrs[0];
+    })
+  );
+});
+
+app.get('/api/resolve6.txt', dnsLimiter, (req, res) => {
+  res.type('text/plain; charset=utf-8');
+  const q = (req.query.q || '').trim();
+  if (!q) return res.status(400).send('error: 请输入域名');
+  ipdb.resolveIPv6(q)
+    .then(addrs => {
+      if (!addrs || addrs.length === 0) return res.status(404).send('error: 该域名无 IPv6 记录');
+      res.send(addrs[0]);
+    })
+    .catch(err => res.status(404).send(`error: ${err.message}`));
+});
+
+// ── 6. GET /api/query?q={ip或域名} — 综合查询（保留原有接口） ──
+app.get('/api/query', dnsLimiter, (req, res) => {
+  const q = (req.query.q || '').trim();
+  if (!q) {
+    return res.json({ success: false, error: '请输入IP地址或域名' });
+  }
+
+  respond(req, res,
+    // JSON
+    () => ipdb.queryWithResolve(q).then(data => data),
+    // TXT
+    () => ipdb.queryWithResolve(q).then(data => {
+      if (!data || !data.success) {
+        return data && data.error ? `错误: ${data.error}` : '查询失败';
+      }
+      return ipdb.formatLocationText(data);
+    })
+  );
+});
+
+app.get('/api/query.txt', dnsLimiter, (req, res) => {
+  res.type('text/plain; charset=utf-8');
+  const q = (req.query.q || '').trim();
+  if (!q) return res.status(400).send('error: 请输入IP地址或域名');
+  
+  ipdb.queryWithResolve(q).then(data => {
+    if (!data || !data.success) {
+      return res.status(404).send(`error: ${data && data.error ? data.error : '查询失败'}`);
+    }
+    res.send(ipdb.formatLocationText(data));
+  }).catch(err => {
+    res.status(500).send(`error: ${err.message}`);
+  });
+});
+
+// ── 7. GET /api/info — 数据库信息 ──
+app.get('/api/info', limiter, (req, res) => {
+  respond(req, res,
+    // JSON
+    () => ipdb.getInfo(),
+    // TXT
+    () => {
+      const info = ipdb.getInfo();
+      if (!info.success) return `错误: ${info.error}`;
+      return `IP 数据库信息
+版本: ${info.version || '未知'}
+描述: ${info.description || '纯真IP库'}
+数据库路径: ${info.dbPath || '未知'}`;
+    }
+  );
+});
+
+// ── 8. POST /api/batch — 批量 IP 查询 ──
+app.post('/api/batch', limiter, (req, res) => {
+  const { ips } = req.body || {};
+  if (!ips || !Array.isArray(ips) || ips.length === 0) {
+    return res.json({ success: false, error: '请输入 IP 地址数组' });
+  }
+  if (ips.length > 50) {
+    return res.json({ success: false, error: '单次最多查询 50 个 IP' });
+  }
+  const results = ips.map(ip => {
+    const trimmed = (ip || '').trim();
+    if (!trimmed || !net.isIP(trimmed)) {
+      return { input: trimmed, success: false, error: '无效的 IP 地址' };
+    }
+    const r = ipdb.query(trimmed);
+    return { input: trimmed, ...r };
+  });
+  res.json({ success: true, count: results.length, results });
+});
+
+// ── 7. GET /api/status — 数据库状态 ──
+app.get('/api/status', limiter, (req, res) => {
+  respond(req, res,
+    // JSON
+    () => {
+      const databases = updater.getDatabaseStatus();
+      return { success: true, databases };
+    },
+    // TXT
+    () => {
+      const databases = updater.getDatabaseStatus();
+      let output = 'IP 数据库状态:\n\n';
+      databases.forEach(db => {
+        if (db.exists) {
+          const sizeMB = (db.size / 1024 / 1024).toFixed(2);
+          const date = db.mtime ? new Date(db.mtime).toISOString().slice(0, 10) : '未知';
+          output += `✅ ${db.name} (${db.description})\n`;
+          output += `   文件: ${db.file}\n`;
+          output += `   大小: ${sizeMB} MB\n`;
+          output += `   更新: ${date}\n\n`;
+        } else {
+          output += `❌ ${db.name} (${db.description})\n`;
+          output += `   文件: ${db.file}\n`;
+          output += `   状态: 未下载\n\n`;
+        }
+      });
+      return output.trim();
+    }
+  );
+});
+
+// ── 兼容旧版路径 .txt 后缀的直接访问 ──
+app.get('/api/info.txt', limiter, (req, res) => {
+  res.type('text/plain; charset=utf-8');
+  const info = ipdb.getInfo();
+  if (!info.success) return res.status(500).send(`error: ${info.error}`);
+  res.send(`IP 数据库信息
+版本: ${info.version || '未知'}
+描述: ${info.description || '纯真IP库'}
+数据库路径: ${info.dbPath || '未知'}`);
+});
+
+app.get('/api/status.txt', limiter, (req, res) => {
+  res.type('text/plain; charset=utf-8');
+  const databases = updater.getDatabaseStatus();
+  let output = 'IP 数据库状态:\n\n';
+  databases.forEach(db => {
+    if (db.exists) {
+      const sizeMB = (db.size / 1024 / 1024).toFixed(2);
+      const date = db.mtime ? new Date(db.mtime).toISOString().slice(0, 10) : '未知';
+      output += `✅ ${db.name} (${db.description})\n`;
+      output += `   文件: ${db.file}\n`;
+      output += `   大小: ${sizeMB} MB\n`;
+      output += `   更新: ${date}\n\n`;
+    } else {
+      output += `❌ ${db.name} (${db.description})\n`;
+      output += `   文件: ${db.file}\n`;
+      output += `   状态: 未下载\n\n`;
+    }
+  });
+  res.send(output.trim());
+});
+
+// ── 10. GET /api/stats?range=daily|weekly|monthly|yearly — 网站统计 ──
+app.get('/api/stats', limiter, (req, res) => {
+  const range = (req.query.range || 'daily').toLowerCase();
+  const daysMap = { daily: 1, weekly: 7, monthly: 30, yearly: 365 };
+  const days = daysMap[range] || 1;
+
+  const data = stats.getStats(days);
+  res.json({
+    success: true,
+    range,
+    days,
+    ...data
+  });
+});
+
+// ── 健康检查 ──
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', uptime: process.uptime() });
+});
+
+// ── 404 兜底 ──
+app.use((req, res) => {
+  if (req.path.startsWith('/api/')) {
+    res.json({ success: false, error: `未知接口: ${req.method} ${req.path}` });
+  } else {
+    res.status(404).type('text/plain').send('Not Found');
+  }
+});
+
+// ──────────── 全局错误处理 ────────────
+app.use((err, req, res, next) => {
+  console.error(`[错误] ${req.method} ${req.originalUrl}:`, err.message);
+  // 生产环境过滤敏感路径信息
+  const safeMessage = (err.message || '').replace(/\/root\/[^\s,)]+/g, '(路径已隐藏)');
+  if (req.path.startsWith('/api/')) {
+    res.json({ success: false, error: `服务器内部错误: ${safeMessage}` });
+  } else {
+    res.status(500).type('text/plain').send('Internal Server Error');
+  }
+});
+
+// ──────────── 启动服务器 ────────────
+
+// 创建 HTTP 服务器
+const httpServer = http.createServer(app);
+
+// 如果配置了 SSL 证书，同时创建 HTTPS 服务器
+let httpsServer = null;
+if (config.ssl && config.ssl.key && config.ssl.cert) {
+  try {
+    const sslOptions = {
+      key: fs.readFileSync(config.ssl.key),
+      cert: fs.readFileSync(config.ssl.cert),
+    };
+    httpsServer = https.createServer(sslOptions, app);
+    httpsServer.listen(443, HOST, () => {
+      console.log(`  HTTPS:     https://${HOST === '::' ? '0.0.0.0' : HOST}:443`);
+    });
+    console.log('  已启用 HTTPS (SSL 证书已加载)');
+  } catch (e) {
+    console.error(`  ⚠ HTTPS 启动失败: ${e.message}`);
+  }
+}
+
+httpServer.listen(PORT, HOST, () => {
+  console.log('==================================================');
+  console.log('  纯真IP库在线查询系统 v2.0 (模块化架构)');
+  console.log('==================================================');
+  console.log(`  服务地址:  http://${HOST}:${PORT}`);
+  console.log(`  本地访问:  http://127.0.0.1:${PORT}`);
+  console.log(`  IPv6访问:  http://[::1]:${PORT}`);
+  console.log(`  远程访问:  http://<本机IP>:${PORT}`);
+  console.log('--------------------------------------------------');
+  console.log('  API 接口:');
+  console.log('    GET /api/myip         - 获取本机公网IP');
+  console.log('    GET /api/location?q=  - IP地址查地理位置');
+  console.log('    GET /api/mylocation   - 获取本机地理位置');
+  console.log('    GET /api/resolve4?q=  - 域名解析 IPv4');
+  console.log('    GET /api/resolve6?q=  - 域名解析 IPv6');
+  console.log('    GET /api/query?q=     - 综合查询(IP或域名)');
+  console.log('    GET /api/info         - 数据库信息');
+  console.log('    GET /api/status       - 数据库状态');
+  console.log('  所有接口支持 JSON / .txt 纯文本双格式');
+  console.log('==================================================');
+  
+  // ─── 启动内置定时更新 ───
+  try {
+    updater.scheduleWeeklyUpdate((results) => {
+      // 更新成功后自动重新加载数据库
+      try {
+        ipdb.reloadDatabase();
+        console.log('[服务器] 数据库已重新加载（更新后）');
+      } catch (e) {
+        console.error('[服务器] 重新加载数据库失败:', e.message);
+      }
+    });
+  } catch (e) {
+    console.error('[服务器] 设置定时更新失败:', e.message);
+  }
+});
+
+module.exports = app;

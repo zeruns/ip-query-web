@@ -1,0 +1,11 @@
+# ─── Docker ignore — 不打包进镜像的文件 ───
+node_modules/
+.git/
+data/
+*.tar.gz
+*.zip
+.env
+.env.local
+install.sh
+README.md
+.DS_Store

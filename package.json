@@ -1,0 +1,19 @@
+{
+  "name": "ip-query-web",
+  "version": "2.0.0",
+  "description": "纯真IP库在线查询系统 - 支持IPv4/IPv6/域名查询",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "query": "node cli.js"
+  },
+  "dependencies": {
+    "compression": "^1.8.1",
+    "express": "4.18.2",
+    "express-rate-limit": "^8.5.2",
+    "ipdb": "0.4.0",
+    "node-cron": "^3.0.2",
+    "qqwry.ipdb": "2026.4.15"
+  },
+  "license": "MIT"
+}

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>API文档 - IP归属地查询 | 本机IP | 我的IP</title>
+  <meta name="description" content="纯真IP库在线查询系统的API接口文档，支持IP归属地查询、域名解析、IPv4/IPv6、本机公网IP获取，提供JSON和TXT双格式输出。">
+  <meta name="keywords" content="IP查询API,IP归属地API,本机IP接口,公网IP接口,域名解析API,地理位置API">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://ip.zeruns.top/api-docs.html">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="shortcut icon" href="/favicon.ico">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      min-height: 100vh;
+      padding-top: 60px;
+      color: #e0e0e0;
+    }
+    .navbar {
+      position: fixed; top:0; left:0; right:0; z-index:100;
+      background: rgba(15,12,41,0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      padding: 0 20px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .navbar a { color: rgba(255,255,255,0.5); text-decoration: none; padding: 8px 18px; border-radius: 8px; font-size: 14px; transition: all 0.2s; }
+    .navbar a:hover { color: #fff; background: rgba(255,255,255,0.06); }
+    .navbar a.active { color: #8b7dff; background: rgba(108,99,255,0.12); font-weight: 600; }
+    .navbar .brand { color: #8b7dff; font-weight: 700; font-size: 15px; margin-right: 12px; }
+    .container { max-width: 880px; margin: 0 auto; padding: 20px 16px 40px; }
+    h1 { text-align: center; font-size: 24px; margin-bottom: 6px; background: linear-gradient(90deg, #6c63ff, #b388ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .subtitle { text-align: center; color: rgba(255,255,255,0.4); font-size: 13px; margin-bottom: 28px; }
+
+    .api-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 24px; margin-bottom: 18px; }
+    .api-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+    .api-card-number { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, #6c63ff, #8b7dff); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+    .api-card-title { color: #fff; font-size: 16px; font-weight: 600; }
+    .api-desc { color: rgba(255,255,255,0.55); font-size: 13px; margin-bottom: 12px; line-height: 1.6; }
+
+    .endpoint-row {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+      background: rgba(0,0,0,0.25); border-radius: 8px; padding: 10px 14px; margin-bottom: 8px;
+      font-family: 'SF Mono','Fira Code','Consolas',monospace; font-size: 13px;
+    }
+    .endpoint-row .method { color: #8b7dff; font-weight: 600; }
+    .endpoint-row .path { color: #e0e0e0; word-break: break-all; flex:1; min-width:0; }
+    .endpoint-row .param { color: #ffb432; }
+    .endpoint-row .ftag {
+      font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 600; flex-shrink:0;
+    }
+    .ftag-json { background: rgba(108,99,255,0.15); color: #8b7dff; }
+    .ftag-txt { background: rgba(0,200,150,0.15); color: #00c896; }
+
+    .example-row {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+      background: rgba(0,0,0,0.2); border-radius: 6px; padding: 8px 12px; margin-bottom: 6px;
+      font-family: 'SF Mono','Fira Code','Consolas',monospace; font-size: 12px;
+    }
+    .example-row .url { color: #6c63ff; word-break: break-all; flex:1; min-width:0; }
+    .example-row .full-url { color: rgba(255,255,255,0.25); font-size: 11px; word-break: break-all; display: none; }
+    .example-row .full-url.show { display: inline; }
+    .btn-test {
+      flex-shrink: 0; padding: 4px 12px; border: 1px solid rgba(108,99,255,0.3); border-radius: 6px;
+      background: transparent; color: #8b7dff; font-size: 11px; cursor: pointer; transition: all 0.2s;
+      font-family: inherit;
+    }
+    .btn-test:hover { background: rgba(108,99,255,0.15); border-color: #8b7dff; }
+    .btn-test.loading { opacity:0.5; pointer-events:none; }
+    .btn-test.done { border-color: rgba(0,200,150,0.3); color: #00c896; background: rgba(0,200,150,0.1); }
+    .btn-test.err { border-color: rgba(255,50,50,0.3); color: #ff6b6b; background: rgba(255,50,50,0.1); }
+
+    .test-result {
+      display: none; margin-top: 4px; border-radius: 6px;
+      font-family: 'SF Mono','Fira Code','Consolas',monospace; font-size: 11px; line-height: 1.6;
+      word-break: break-all; max-height: 320px; overflow: auto;
+    }
+    .test-result.show { display: block; }
+    .test-result.success { background: rgba(0,200,150,0.06); border: 1px solid rgba(0,200,150,0.1); }
+    .test-result.error { background: rgba(255,50,50,0.06); border: 1px solid rgba(255,50,50,0.1); }
+
+    .test-status {
+      display: flex; align-items: center; gap: 8px;
+      padding: 4px 10px 4px 0; font-size: 11px;
+    }
+    .test-status .http-badge {
+      display: inline-block; padding: 2px 8px; border-radius: 4px;
+      font-weight: 700; font-size: 11px;
+    }
+    .test-status .http-badge.ok { background: rgba(0,200,150,0.15); color: #00c896; }
+    .test-status .http-badge.err { background: rgba(255,50,50,0.15); color: #ff6b6b; }
+    .test-status .http-badge.redir { background: rgba(255,180,50,0.15); color: #ffb432; }
+    .test-status .resp-type { color: rgba(255,255,255,0.4); font-size: 10px; }
+    .test-status .resp-size { color: rgba(255,255,255,0.25); font-size: 10px; margin-left: auto; }
+
+    .test-body {
+      padding: 8px 10px; margin: 4px 0 0; border-radius: 4px;
+      white-space: pre-wrap; font-size: 11px; line-height: 1.5;
+      color: rgba(255,255,255,0.75);
+    }
+    .test-body.json { color: #b8b8ff; }
+    .test-body.text { color: rgba(255,255,255,0.75); }
+
+    .section-label { color: rgba(255,255,255,0.3); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin: 12px 0 6px; }
+
+    .footer { text-align: center; margin-top: 28px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,0.06); color: rgba(255,255,255,0.2); font-size: 12px; line-height: 1.8; }
+    .footer a { color: rgba(108,99,255,0.5); text-decoration: none; transition: color 0.2s; }
+    .footer a:hover { color: rgba(108,99,255,0.8); }
+    .footer .section-title { color: rgba(255,255,255,0.3); font-size: 11px; margin-bottom: 4px; letter-spacing: 1px; }
+
+    @media (max-width: 640px) {
+      body { padding-top: 50px; }
+      .navbar { height: 48px; padding: 0 12px; gap: 4px; }
+      .navbar .brand { display: none; }
+      .navbar a { padding: 6px 12px; font-size: 13px; }
+      .container { padding: 12px 10px; }
+      .api-card { padding: 16px 12px; }
+      .endpoint-row { font-size: 11px; padding: 8px 10px; }
+      .example-row { font-size: 11px; }
+    }
+  </style>
+</head>
+<body>
+<div id="header"><div class="navbar"><span class="brand">🌐 IPQuery</span></div></div>
+<div class="container">
+  <h1>📖 API 接口文档</h1>
+  <div class="subtitle">纯真IP库查询服务 · 全部接口支持 JSON 和 TXT 两种格式</div>
+
+  <!-- 1 -->
+  <div class="api-card">
+    <div class="api-card-header"><div class="api-card-number">1</div><div class="api-card-title">综合查询</div></div>
+    <div class="api-desc">支持 IP 地址和域名查询，自动识别类型，返回详细地理位置信息。推荐使用此接口进行所有查询。</div>
+    <div class="endpoint-row"><span class="method">GET</span> <span class="path">/api/query?q=<span class="param">{ip或域名}</span></span> <span class="ftag ftag-json">JSON</span></div>
+    <div class="endpoint-row"><span class="method">GET</span> <span class="path">/api/query.txt?q=<span class="param">{ip或域名}</span></span> <span class="ftag ftag-txt">TXT</span></div>
+    <div class="section-label">📎 请求示例</div>
+    <div class="example-row" data-path="/api/query?q=114.114.114.114"><span class="url">/api/query?q=114.114.114.114</span><button class="btn-test" onclick="testAPI(this)">▶ 测试</button><div class="test-result"></div></div>
+    <div class="example-row" data-path="/api/query?q=blog.zeruns.com"><span class="url">/api/query?q=blog.zeruns.com</span><button class="btn-test" onclick="testAPI(this)">▶ 测试</button><div class="test-result"></div></div>
+    <div class="example-row" data-path="/api/query.txt?q=114.114.114.114"><span class="url">/api/query.txt?q=114.114.114.114</span><button class="btn-test" onclick="testAPI(this)">▶ 测试</button><div class="test-result"></div></div>
+  </div>
+
+  <!-- 2 -->
+  <div class="api-card">
+    <div class="api-card-header"><div class="api-card-number">2</div><div class="api-card-title">获取本机公网 IP</div></div>
+    <div class="api-desc">返回当前请求来源的公网 IP 地址，无需任何参数。</div>
+    <div class="endpoint-row"><span class="method">GET</span> <span class="path">/api/myip</span> <span class="ftag ftag-json">JSON</span></div>
+    <div class="endpoint-row"><span class="method">GET</span> <span class="path">/api/myip.txt</span> <span class="ftag ftag-txt">TXT</span></div>
+    <div class="section-label">📎 请求示例</div>
+    <div class="example-row" data-path="/api/myip"><span class="url">/api/myip</span><button class="btn-test" onclick="testAPI(this)">▶ 测试</button><div class="test-result"></div></div>
+    <div class="example-row" data-path="/api/myip.txt"><span class="url">/api/myip.txt</span><button class="btn-test" onclick="testAPI(this)">▶ 测试</button><div class="test-result"></div></div>
+  </div>
+
+  <!-- 3 -->
+  <div class="api-card">
+    <div class="api-card-header"><div class="api-card-number">3</div><div class="api-card-title">输入 IP 查地理位置</div></div>
+    <div class="api-desc">根据指定的 IP 地址查询其地理位置信息。仅支持 IP，不支持域名。</div>
+    <div class="endpoint-row"><span class="method">GET</span> <span class="path">/api/location?q=<span class="param">{ip}</span></span> <span class="ftag ftag-json">JSON</span></div>
+    <div class="endpoint-row"><span class="method">GET</span> <span class="path">/api/location.txt?q=<span class="param">{ip}</span></span> <span class="ftag ftag-txt">TXT</span></div>
+    <div class="section-label">📎 请求示例</div>
+    <div class="example-row" data-path="/api/location?q=8.8.8.8"><span class="url">/api/location?q=8.8.8.8</span><button class="btn-test" onclick="testAPI(this)">▶ 测试</button><div class="test-result"></div></div>
+    <div class="example-row" data-path="/api/location.txt?q=8.8.8.8"><span class="url">/api/location.txt?q=8.8.8.8</span><button class="btn-test" onclick="testAPI(this)">▶ 测试</button><div class="test-result"></div></div>
+  </div>
+
+  <!-- 4 -->
+  <div class="api-card">
+    <div class="api-card-header"><div class="api-card-number">4</div><div class="api-card-title">获取访问者地理位置</div></div>
+    <div class="api-desc">返回服务端看到的请求来源 IP 及其地理位置。通过 Tailscale/代理访问时，显示的是隧道入口 IP（如 <code>100.x.x.x</code>），非客户端真实公网 IP。</div>
+    <div class="endpoint-row"><span class="method">GET</span> <span class="path">/api/mylocation</span> <span class="ftag ftag-json">JSON</span></div>
+    <div class="endpoint-row"><span class="method">GET</span> <span class="path">/api/mylocation.txt</span> <span class="ftag ftag-txt">TXT</span></div>
+    <div class="section-label">📎 请求示例</div>
+    <div class="example-row" data-path="/api/mylocation"><span class="url">/api/mylocation</span><button class="btn-test" onclick="testAPI(this)">▶ 测试</button><div class="test-result"></div></div>
+    <div class="example-row" data-path="/api/mylocation.txt"><span class="url">/api/mylocation.txt</span><button class="btn-test" onclick="testAPI(this)">▶ 测试</button><div class="test-result"></div></div>
+  </div>
+
+  <!-- 5 -->
+  <div class="api-card">
+    <div class="api-card-header"><div class="api-card-number">5</div><div class="api-card-title">域名解析 IPv4</div></div>
+    <div class="api-desc">解析指定域名的所有 IPv4 地址（A 记录），JSON 格式返回数量和 IP 列表。</div>
+    <div class="endpoint-row"><span class="method">GET</span> <span class="path">/api/resolve4?q=<span class="param">{域名}</span></span> <span class="ftag ftag-json">JSON</span></div>
+    <div class="endpoint-row"><span class="method">GET</span> <span class="path">/api/resolve4.txt?q=<span class="param">{域名}</span></span> <span class="ftag ftag-txt">TXT</span></div>
+    <div class="section-label">📎 请求示例</div>
+    <div class="example-row" data-path="/api/resolve4?q=blog.zeruns.com"><span class="url">/api/resolve4?q=blog.zeruns.com</span><button class="btn-test" onclick="testAPI(this)">▶ 测试</button><div class="test-result"></div></div>
+    <div class="example-row" data-path="/api/resolve4.txt?q=blog.zeruns.com"><span class="url">/api/resolve4.txt?q=blog.zeruns.com</span><button class="btn-test" onclick="testAPI(this)">▶ 测试</button><div class="test-result"></div></div>
+  </div>
+
+  <!-- 6 -->
+  <div class="api-card">
+    <div class="api-card-header"><div class="api-card-number">6</div><div class="api-card-title">域名解析 IPv6</div></div>
+    <div class="api-desc">解析指定域名的所有 IPv6 地址（AAAA 记录），JSON 格式返回数量和 IP 列表。</div>
+    <div class="endpoint-row"><span class="method">GET</span> <span class="path">/api/resolve6?q=<span class="param">{域名}</span></span> <span class="ftag ftag-json">JSON</span></div>
+    <div class="endpoint-row"><span class="method">GET</span> <span class="path">/api/resolve6.txt?q=<span class="param">{域名}</span></span> <span class="ftag ftag-txt">TXT</span></div>
+    <div class="section-label">📎 请求示例</div>
+    <div class="example-row" data-path="/api/resolve6?q=blog.zeruns.com"><span class="url">/api/resolve6?q=blog.zeruns.com</span><button class="btn-test" onclick="testAPI(this)">▶ 测试</button><div class="test-result"></div></div>
+    <div class="example-row" data-path="/api/resolve6.txt?q=blog.zeruns.com"><span class="url">/api/resolve6.txt?q=blog.zeruns.com</span><button class="btn-test" onclick="testAPI(this)">▶ 测试</button><div class="test-result"></div></div>
+  </div>
+
+  <!-- 7 -->
+  <div class="api-card">
+    <div class="api-card-header"><div class="api-card-number">7</div><div class="api-card-title">获取 IP 库信息</div></div>
+    <div class="api-desc">返回当前使用的纯真 IP 库的版本号和描述信息。</div>
+    <div class="endpoint-row"><span class="method">GET</span> <span class="path">/api/info</span> <span class="ftag ftag-json">JSON</span></div>
+    <div class="section-label">📎 请求示例</div>
+    <div class="example-row" data-path="/api/info"><span class="url">/api/info</span><button class="btn-test" onclick="testAPI(this)">▶ 测试</button><div class="test-result"></div></div>
+  </div>
+
+  <!-- 8 -->
+  <div class="api-card">
+    <div class="api-card-header"><div class="api-card-number">8</div><div class="api-card-title">IP 库状态</div></div>
+    <div class="api-desc">返回当前 IP 数据库的运行状态、版本和文件信息。</div>
+    <div class="endpoint-row"><span class="method">GET</span> <span class="path">/api/status</span> <span class="ftag ftag-json">JSON</span></div>
+    <div class="section-label">📎 请求示例</div>
+    <div class="example-row" data-path="/api/status"><span class="url">/api/status</span><button class="btn-test" onclick="testAPI(this)">▶ 测试</button><div class="test-result"></div></div>
+  </div>
+
+  <div id="footer"></div>
+</div>
+
+<script>
+function testAPI(btn) {
+  const row = btn.closest('.example-row');
+  const path = row.getAttribute('data-path');
+  const resultEl = row.querySelector('.test-result');
+  const base = window.location.origin;
+  const fullUrl = base + path;
+
+  // 切换加载状态
+  btn.textContent = '⏳';
+  btn.className = 'btn-test loading';
+  resultEl.className = 'test-result';
+  resultEl.innerHTML = '';
+
+  fetch(fullUrl, { signal: AbortSignal.timeout(15000) })
+    .then(async resp => {
+      const text = await resp.text();
+      const isJson = resp.headers.get('content-type')?.includes('json') || false;
+      let display = text;
+      let typeLabel = isJson ? 'JSON' : 'TXT';
+      // 如果是 JSON，格式化输出
+      if (isJson) {
+        try {
+          const json = JSON.parse(text);
+          display = JSON.stringify(json, null, 2);
+        } catch (e) { /* 纯文本 */ }
+      }
+
+      // 截断太长
+      let sizeInfo = '';
+      if (display.length > 1200) {
+        sizeInfo = ` (${display.length} 字节)`;
+        display = display.slice(0, 1200) + '\n⋯⋯ 响应已截断 (仅显示前 1200 字节)';
+      } else {
+        sizeInfo = ` (${display.length} 字节)`;
+      }
+
+      // 状态码颜色
+      const statusClass = resp.status >= 200 && resp.status < 300 ? 'ok' : (resp.status >= 300 && resp.status < 400 ? 'redir' : 'err');
+
+      resultEl.innerHTML =
+        '<div class="test-status">' +
+          '<span class="http-badge ' + statusClass + '">HTTP ' + resp.status + '</span>' +
+          '<span class="resp-type">' + typeLabel + '</span>' +
+          '<span class="resp-size">' + sizeInfo + '</span>' +
+        '</div>' +
+        '<div class="test-body ' + (isJson ? 'json' : 'text') + '">' + escHtml(display) + '</div>';
+
+      resultEl.className = 'test-result show ' + (resp.ok ? 'success' : 'error');
+      btn.textContent = '✅';
+      btn.className = 'btn-test done';
+    })
+    .catch(err => {
+      resultEl.innerHTML =
+        '<div class="test-status">' +
+          '<span class="http-badge err">❌ 错误</span>' +
+          '<span>' + escHtml(err.message) + '</span>' +
+        '</div>';
+      resultEl.className = 'test-result show error';
+      btn.textContent = '❌';
+      btn.className = 'btn-test err';
+    });
+}
+
+function escHtml(str) { const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
+</script>
+<script>
+(function(){
+  var path = location.pathname;
+  var activeNav = 'home';
+  if (path.indexOf('api-docs') !== -1) activeNav = 'docs';
+  else if (path.indexOf('api-recommend') !== -1) activeNav = 'recommend';
+  else if (path.indexOf('stats') !== -1) activeNav = 'stats';
+
+  fetch('/components/header.html')
+    .then(function(r){ return r.text(); })
+    .then(function(html){
+      document.getElementById('header').innerHTML = html;
+      var link = document.querySelector('.navbar a[data-nav="'+activeNav+'"]');
+      if (link) link.className = 'active';
+    });
+
+  fetch('/components/footer.html')
+    .then(function(r){ return r.text(); })
+    .then(function(html){
+      document.getElementById('footer').innerHTML = html;
+    });
+})();
+</script>
+</body>
+</html>

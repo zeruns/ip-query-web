@@ -1,0 +1,19 @@
+# ─── Node.js ───
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# ─── 环境配置 ───
+.env
+.env.local
+
+# ─── IP 数据库（从 npm 或自动更新获取） ───
+data/
+
+# ─── 构建产物 ───
+*.tar.gz
+*.zip
+
+# ─── 系统 ───
+.DS_Store
+Thumbs.db

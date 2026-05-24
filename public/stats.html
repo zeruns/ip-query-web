@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>网站统计 - IP归属地查询</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="shortcut icon" href="/favicon.ico">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      min-height: 100vh;
+      padding-top: 60px;
+      color: #e0e0e0;
+    }
+    .navbar {
+      position: fixed; top:0; left:0; right:0; z-index:100;
+      background: rgba(15,12,41,0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      padding: 0 20px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .navbar a { color: rgba(255,255,255,0.5); text-decoration: none; padding: 8px 18px; border-radius: 8px; font-size: 14px; transition: all 0.2s; }
+    .navbar a:hover { color: #fff; background: rgba(255,255,255,0.06); }
+    .navbar a.active { color: #8b7dff; background: rgba(108,99,255,0.12); font-weight: 600; }
+    .navbar .brand { color: #8b7dff; font-weight: 700; font-size: 15px; margin-right: 12px; }
+
+    .container { max-width: 900px; margin: 0 auto; padding: 20px 16px 40px; }
+    h1 { text-align: center; font-size: 24px; margin-bottom: 6px; background: linear-gradient(90deg, #6c63ff, #b388ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .subtitle { text-align: center; color: rgba(255,255,255,0.4); font-size: 13px; margin-bottom: 28px; }
+
+    /* 指标卡片 */
+    .metrics-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+    .metric-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 18px;
+      text-align: center;
+    }
+    .metric-value { font-size: 26px; font-weight: 700; line-height: 1.2; }
+    .metric-label { color: rgba(255,255,255,0.35); font-size: 12px; margin-top: 4px; text-transform: uppercase; letter-spacing: 1px; }
+    .metric-card.pv .metric-value { color: #8b7dff; }
+    .metric-card.api .metric-value { color: #00c896; }
+
+    /* Tab 切换 */
+    .tab-row { display: flex; gap: 6px; margin-bottom: 20px; justify-content: center; }
+    .tab-btn {
+      padding: 8px 20px; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;
+      background: transparent; color: rgba(255,255,255,0.5); font-size: 14px; cursor: pointer; transition: all 0.2s;
+    }
+    .tab-btn:hover { color: #fff; border-color: rgba(255,255,255,0.2); }
+    .tab-btn.active { color: #8b7dff; border-color: rgba(108,99,255,0.4); background: rgba(108,99,255,0.1); font-weight: 600; }
+
+    /* 表格 */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { padding: 10px 14px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    th { color: rgba(255,255,255,0.35); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; white-space: nowrap; }
+    td { color: rgba(255,255,255,0.8); }
+    td.date { color: rgba(255,255,255,0.5); font-size: 13px; text-align: left; }
+    td.count { color: #8b7dff; font-weight: 600; }
+    td.zero { color: rgba(255,255,255,0.15); }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+
+    /* API 排行 */
+    .api-table th { text-align: left; }
+    .api-table td { text-align: left; }
+    .api-table td.count { text-align: right; font-weight: 400; }
+    .bar-wrap { display: inline-block; width: 100%; max-width: 200px; height: 6px; background: rgba(255,255,255,0.06); border-radius: 3px; vertical-align: middle; margin-left: 10px; }
+    .bar-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, #6c63ff, #8b7dff); transition: width 0.5s ease; }
+
+    .card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 18px;
+    }
+    .card-title { color: rgba(255,255,255,0.5); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
+
+    .loading { text-align: center; padding: 40px; color: rgba(255,255,255,0.3); }
+    .empty { text-align: center; padding: 40px; color: rgba(255,255,255,0.2); font-size: 14px; }
+
+    .footer { text-align: center; margin-top: 24px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,0.06); color: rgba(255,255,255,0.2); font-size: 12px; line-height: 1.8; }
+    .footer a { color: rgba(108,99,255,0.5); text-decoration: none; transition: color 0.2s; }
+    .footer a:hover { color: rgba(108,99,255,0.8); }
+    .footer .section-title { color: rgba(255,255,255,0.3); font-size: 11px; margin-bottom: 4px; letter-spacing: 1px; }
+
+    @media (max-width: 600px) {
+      .metrics-row { grid-template-columns: repeat(2, 1fr); }
+      .metric-value { font-size: 22px; }
+      th, td { padding: 8px 10px; font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+<div id="header"><div class="navbar"><span class="brand">🌐 IPQuery</span></div></div>
+<div class="container">
+  <h1>📊 网站统计</h1>
+  <div class="subtitle">页面访问量 & API 调用次数</div>
+
+  <div class="metrics-row">
+    <div class="metric-card pv">
+      <div class="metric-value" id="todayPV">-</div>
+      <div class="metric-label">今日 PV</div>
+    </div>
+    <div class="metric-card api">
+      <div class="metric-value" id="todayAPI">-</div>
+      <div class="metric-label">今日 API 调用</div>
+    </div>
+    <div class="metric-card pv">
+      <div class="metric-value" id="totalPV">-</div>
+      <div class="metric-label">总计 PV</div>
+    </div>
+    <div class="metric-card api">
+      <div class="metric-value" id="totalAPI">-</div>
+      <div class="metric-label">总计 API 调用</div>
+    </div>
+  </div>
+
+  <div class="tab-row">
+    <button class="tab-btn active" data-range="daily">今日</button>
+    <button class="tab-btn" data-range="weekly">7 天</button>
+    <button class="tab-btn" data-range="monthly">30 天</button>
+    <button class="tab-btn" data-range="yearly">1 年</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📅 每日明细</div>
+    <div class="loading" id="loading">加载中...</div>
+    <div class="empty" id="empty" style="display:none">暂无数据</div>
+    <div class="table-wrap" id="dailyTable" style="display:none"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🔌 API 接口排行</div>
+    <div class="table-wrap" id="apiTable"></div>
+  </div>
+
+  <div id="footer"></div>
+</div>
+
+<script>
+(function(){
+  var path = location.pathname;
+  var activeNav = 'home';
+  if (path.indexOf('api-docs') !== -1) activeNav = 'docs';
+  else if (path.indexOf('api-recommend') !== -1) activeNav = 'recommend';
+  else if (path.indexOf('stats') !== -1) activeNav = 'stats';
+
+  fetch('/components/header.html')
+    .then(function(r){ return r.text(); })
+    .then(function(html){
+      document.getElementById('header').innerHTML = html;
+      var link = document.querySelector('.navbar a[data-nav="'+activeNav+'"]');
+      if (link) link.className = 'active';
+    });
+
+  fetch('/components/footer.html')
+    .then(function(r){ return r.text(); })
+    .then(function(html){
+      document.getElementById('footer').innerHTML = html;
+    });
+})();
+
+// ── Tab 切换 ──
+var currentRange = 'daily';
+var tabs = document.querySelectorAll('.tab-btn');
+tabs.forEach(function(btn){
+  btn.addEventListener('click', function(){
+    tabs.forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    currentRange = btn.getAttribute('data-range');
+    loadStats();
+  });
+});
+
+function $(id){ return document.getElementById(id); }
+function esc(s){ var d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+async function loadStats(){
+  $('loading').style.display = 'block';
+  $('empty').style.display = 'none';
+  $('dailyTable').style.display = 'none';
+
+  try {
+    var resp = await fetch('/api/stats?range=' + currentRange);
+    var data = await resp.json();
+    if (!data.success) { $('loading').style.display = 'none'; $('empty').style.display = 'block'; return; }
+
+    // 更新指标卡片
+    var daily = data.daily;
+    var today = daily[daily.length - 1];
+    $('todayPV').textContent = today ? today.pageviews : '0';
+    $('todayAPI').textContent = today ? today.api_calls : '0';
+    $('totalPV').textContent = data.total_pv;
+    $('totalAPI').textContent = data.total_api;
+
+    // 每日明细表
+    var hasData = daily.some(function(d){ return d.pageviews > 0 || d.api_calls > 0; });
+    if (!hasData) {
+      $('loading').style.display = 'none';
+      $('empty').style.display = 'block';
+    } else {
+      var html = '<table><thead><tr><th>日期</th><th>PV</th><th>API 调用</th></tr></thead><tbody>';
+      daily.forEach(function(d){
+        html += '<tr>' +
+          '<td class="date">' + d.date + '</td>' +
+          '<td class="count' + (d.pageviews === 0 ? ' zero' : '') + '">' + d.pageviews + '</td>' +
+          '<td class="count' + (d.api_calls === 0 ? ' zero' : '') + '">' + d.api_calls + '</td>' +
+          '</tr>';
+      });
+      html += '</tbody></table>';
+      $('dailyTable').innerHTML = html;
+      $('dailyTable').style.display = 'block';
+      $('loading').style.display = 'none';
+    }
+
+    // API 排行表
+    var breakdown = data.api_breakdown;
+    var entries = Object.entries(breakdown).sort(function(a,b){ return b[1] - a[1]; });
+    if (entries.length === 0) {
+      $('apiTable').innerHTML = '<div class="empty" style="display:block">暂无 API 调用记录</div>';
+    } else {
+      var maxVal = entries[0][1] || 1;
+      var h = '<table class="api-table"><thead><tr><th>接口</th><th style="text-align:right;">调用次数</th></tr></thead><tbody>';
+      entries.forEach(function(e){
+        var pct = Math.round(e[1] / maxVal * 100);
+        h += '<tr>' +
+          '<td><code style="color:#8b7dff;font-size:13px;">/api/' + esc(e[0]) + '</code>' +
+          '<span class="bar-wrap"><span class="bar-fill" style="width:' + pct + '%"></span></span></td>' +
+          '<td class="count">' + e[1] + '</td>' +
+          '</tr>';
+      });
+      h += '</tbody></table>';
+      $('apiTable').innerHTML = h;
+    }
+  } catch(e){
+    $('loading').style.display = 'none';
+    $('empty').textContent = '加载失败: ' + e.message;
+    $('empty').style.display = 'block';
+  }
+}
+
+loadStats();
+</script>
+</body>
+</html>
