@@ -271,4 +271,4 @@ IP 地理位置数据来自 [纯真 IP 库 (CZ88.NET)](https://github.com/nmglia
 
 ## 许可证
 
-MIT
+[GNU General Public License v3.0](LICENSE)

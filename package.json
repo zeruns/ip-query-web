@@ -15,5 +15,5 @@
     "node-cron": "^3.0.2",
     "qqwry.ipdb": "2026.4.15"
   },
-  "license": "MIT"
+  "license": "GPL-3.0"
 }
