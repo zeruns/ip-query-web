@@ -147,37 +147,6 @@ function getClientIP(req) {
 }
 
 /**
- * 通过外部服务获取公网 IP
- * 从多个可信源获取，以防某个服务挂掉
- */
-function fetchPublicIP() {
-  return new Promise((resolve, reject) => {
-    const sources = config.publicIPSources;
-    let done = false;
-    sources.forEach(url => {
-      if (done) return;
-      const mod = url.startsWith('https') ? require('https') : http;
-      mod.get(url, res => {
-        let data = '';
-        res.on('data', c => data += c);
-        res.on('end', () => {
-          if (!done) {
-            done = true;
-            resolve(data.trim());
-          }
-        });
-      }).on('error', () => {});
-    });
-    setTimeout(() => {
-      if (!done) {
-        done = true;
-        reject(new Error('获取公网IP超时'));
-      }
-    }, 15000);
-  });
-}
-
-/**
  * 根据请求判断是否期望纯文本响应
  * 逻辑：如果 URL 以 .txt 结尾则强制纯文本；
  *       如果查询参数 ?format=txt 则强制纯文本；
@@ -227,21 +196,20 @@ function respond(req, res, jsonFn, txtFn) {
 
 // ──────────── API 路由 ────────────
 
-// ── 1. GET /api/myip — 返回访问者公网 IP ──
+// ── 1. GET /api/myip — 返回访问者 IP ──
 app.get('/api/myip', limiter, (req, res) => {
+  const clientIP = getClientIP(req);
   respond(req, res,
     // JSON
-    () => fetchPublicIP().then(ip => ({ success: true, ip })),
+    () => ({ success: true, ip: clientIP }),
     // TXT
-    () => fetchPublicIP()
+    () => clientIP
   );
 });
 
 app.get('/api/myip.txt', limiter, (req, res) => {
   res.type('text/plain; charset=utf-8');
-  fetchPublicIP()
-    .then(ip => res.send(ip))
-    .catch(err => res.status(500).send(`error: ${err.message}`));
+  res.send(getClientIP(req));
 });
 
 // ── 2. GET /api/location?q={ip} — 输入 IP 查地理位置 ──

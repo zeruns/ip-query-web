@@ -278,8 +278,7 @@ function escHtml(str) { const d = document.createElement('div'); d.textContent =
 async function queryMyIP() {
   showLoading();
   try {
-    // 调服务端 /api/myip 获取请求来源的 IP（注意：Tailscale/代理下看到的是隧道入口 IP）
-    const r = await fetch('/api/mylocation');
+    const r = await fetch('/api/myip');
     const d = await r.json();
     if (d.success && d.ip) { searchInput.value = d.ip; await search(); }
     else { showError('无法获取本机 IP'); }

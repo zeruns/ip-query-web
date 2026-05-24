@@ -20,8 +20,6 @@ const config = {
   rateLimit: {
     // 普通 API 查询：次/分钟/IP
     max: parseInt(process.env.RATE_LIMIT_MAX, 10) || 120,
-    // 敏感接口（update/reload）：次/分钟/IP
-    sensitive: parseInt(process.env.RATE_LIMIT_SENSITIVE, 10) || 5,
     // 域名解析接口：次/分钟/IP
     dns: parseInt(process.env.RATE_LIMIT_DNS, 10) || 30,
   },

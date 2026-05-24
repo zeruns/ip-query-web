@@ -1,21 +1,40 @@
-# IP 归属地查询系统
+# 纯真IP库在线查询系统 - IP地理位置查询、本机IP查询、域名解析
 
 <p align="center">
-  <strong>纯真IP库在线查询服务</strong><br>
+  <strong>基于纯真IP库的精确地理定位服务</strong><br>
   支持 IPv4 / IPv6 / 域名解析 · 双格式 API（JSON + TXT）· 自带暗色 Web 界面
 </p>
 
 <p align="center">
+  <a href="#项目简介">项目简介</a> ·
   <a href="#快速开始">快速开始</a> ·
   <a href="#api-接口">API 文档</a> ·
   <a href="#配置">配置说明</a> ·
-  <a href="#安全防护">安全防护</a> ·
-  <a href="#第三方API推荐">第三方API推荐</a>
+  <a href="#安全防护">安全防护</a>
 </p>
 
 ---
 
-## 快速开始
+## 项目简介
+
+**ip-query-web** 是一个基于纯真 IP 数据库（qqwry.ipdb）的 IP 地理位置在线查询系统。你可以用它：
+
+- **查询 IP 归属地** — 输入任意 IPv4/IPv6 地址，获取国家、省份、城市、区县、运营商等信息
+- **域名解析** — 自动解析域名的 A/AAAA 记录并查询每个 IP 的地理位置
+- **获取本机 IP** — 通过 `/api/myip` 或 `/api/mylocation` 获取访问者真实的来源 IP
+- **批量查询** — 单次最多查询 50 个 IP 地址
+- **API 服务** — 提供 RESTful API，支持 JSON 和纯文本双格式，方便集成到各类应用中
+- **网站统计** — 内置 PV 和 API 调用统计面板，支持图表展示
+- **自动更新** — 每周一凌晨自动从纯真 IP 库 GitHub 仓库拉取最新数据
+
+### 适用场景
+
+- 获取网站访客来源信息（配合 Nginx 反代可识别真实 IP）
+- 为其他应用提供 IP 地理位置查询 API
+- 用作自定义查询工具或集成到自动化脚本中
+- 学习 Node.js/Express Web 开发与项目架构
+
+## 在线演示
 
 ### 方式一：裸机安装（推荐）
 
@@ -67,7 +86,7 @@ docker compose up -d --build
 | 接口 | 说明 | 限流（次/分钟） |
 |------|------|:---:|
 | `GET /api/query?q=<IP或域名>` | 综合查询（推荐） | 30 |
-| `GET /api/myip` | 获取本机公网 IP | 120 |
+| `GET /api/myip` | 获取访问者 IP 地址 | 120 |
 | `GET /api/location?q=<IP>` | IP 查地理位置 | 120 |
 | `GET /api/mylocation` | 获取访问者地理位置 | 120 |
 | `GET /api/resolve4?q=<域名>` | 域名解析 IPv4 | 30 |
@@ -76,7 +95,6 @@ docker compose up -d --build
 | `GET /api/status` | 数据库状态 | 120 |
 | `GET /api/stats?range=daily\|weekly\|monthly\|yearly` | 网站统计 | 120 |
 | `POST /api/batch` | 批量 IP 查询（≤50） | 120 |
-| `POST /api/reload` | 重新加载数据库 | 5 |
 | `GET /health` | 健康检查 | ∞ |
 
 ### 调用示例
@@ -124,7 +142,6 @@ vim .env               # 按需修改
 | 变量 | 默认值 | 说明 |
 |------|--------|------|
 | `RATE_LIMIT_MAX` | `120` | 普通 API 查询限流（次/分钟/单IP） |
-| `RATE_LIMIT_SENSITIVE` | `5` | 敏感接口限流（update/reload） |
 | `RATE_LIMIT_DNS` | `30` | 域名解析接口限流（DNS 查询较慢，限制更严） |
 
 ### CC 防护配置
@@ -187,7 +204,7 @@ CC_BLOCK_DURATION=30000
 | 层级 | 实现 | 功能 |
 |:---:|------|------|
 | 1 | CC 防护（纯 Node） | 并发限制 + 突发检测 + 慢速攻击防御 + 自动封禁 + IP 黑白名单 |
-| 2 | express-rate-limit | 按接口类型分级限流（普通 / DNS / 敏感） |
+| 2 | express-rate-limit | 按接口类型分级限流（普通 / DNS） |
 | 3 | 安全头 | `X-Frame-Options`, `XSS-Protection`, `CORS` 控制 |
 
 ## Nginx 反向代理
@@ -268,6 +285,15 @@ IP 地理位置数据来自 [纯真 IP 库 (CZ88.NET)](https://github.com/nmglia
 需要服务器部署本项目？可参考这篇推荐：
 
 👉 [VPS/云服务器推荐列表](https://blog.vpszj.cn/archives/41.html)
+
+## 推荐阅读
+
+- **高性价比和便宜的VPS/云服务器推荐：** [https://blog.zeruns.com/archives/383.html](https://blog.zeruns.com/archives/383.html)
+- 我的世界开服教程：[https://blog.zeruns.com/tag/mc/](https://blog.zeruns.com/tag/mc/)
+- 跨境电商独立站搭建教程，WordPress外贸建站指南：[https://blog.zeruns.com/archives/889.html](https://blog.zeruns.com/archives/889.html)
+- Hermes Agent 部署全指南，手把手教你搭建你的第一个AI助手：[https://blog.zeruns.com/archives/939.html](https://blog.zeruns.com/archives/939.html)
+- 阿里云ESA（CDN）测评，免费不限流量，全球节点（含境内）：[https://blog.zeruns.com/archives/920.html](https://blog.zeruns.com/archives/920.html)
+- Discourse论坛搭建教程，零基础部署Discourse开源社区论坛网站：[https://blog.zeruns.com/archives/919.html](https://blog.zeruns.com/archives/919.html)
 
 ## 许可证
 

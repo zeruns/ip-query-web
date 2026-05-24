@@ -223,6 +223,20 @@
 <script>
 const API_SOURCES = [
   {
+    id: 'ipip',
+    name: 'ipip.net（纯真）',
+    url: ip => ip ? `https://myip.ipip.net/s?ip=${ip}` : `https://myip.ipip.net`,
+    parse: d => {
+      // 返回纯文本格式：当前 IP: x.x.x.x  来自于：中国 广东 广州  电信
+      const text = typeof d === 'string' ? d : '';
+      const m = text.match(/IP[：:]?\s*([\d.:a-fA-F]+)/);
+      const loc = text.match(/来自于[：:]\s*(.+)/);
+      return { ip: m ? m[1] : '', location: loc ? loc[1].trim() : text.trim(), raw: text };
+    },
+    link: 'https://ip.zeruns.com/',
+    doc: '基于纯真IP库（本系统同一数据源），无需注册，免费使用。支持IPv4/IPv6，直接请求 https://myip.ipip.net 返回纯文本格式（当前IP+地理位置）。2024年新增限制需传 UA Header。主要用于本机IP查询。'
+  },
+  {
     id: 'ip-api',
     name: 'ip-api.com',
     url: ip => `http://ip-api.com/json/${ip ? ip : ''}?lang=zh-CN`,
