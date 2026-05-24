@@ -216,10 +216,10 @@ app.get('/api/myip.txt', limiter, (req, res) => {
 app.get('/api/location', limiter, (req, res) => {
   const q = (req.query.q || '').trim();
   if (!q) {
-    return res.json({ success: false, error: '请输入IP地址' });
+    return res.json({ success: false, error: '请输入IP地址，示例: /api/location?q=8.8.8.8' });
   }
   if (!net.isIP(q)) {
-    return res.json({ success: false, error: '请输入有效的IP地址' });
+    return res.json({ success: false, error: '请输入有效的IP地址，示例: /api/location?q=8.8.8.8' });
   }
 
   respond(req, res,
@@ -241,7 +241,7 @@ app.get('/api/location.txt', limiter, (req, res) => {
   res.type('text/plain; charset=utf-8');
   const q = (req.query.q || '').trim();
   if (!q || !net.isIP(q)) {
-    return res.status(400).send('error: 请输入有效的IP地址');
+    return res.status(400).send('error: 请输入有效的IP地址，示例: /api/location.txt?q=8.8.8.8');
   }
   const r = ipdb.query(q);
   if (!r.success) return res.status(404).send(`error: ${r.error}`);
@@ -279,7 +279,7 @@ app.get('/api/mylocation.txt', limiter, (req, res) => {
 app.get('/api/resolve4', dnsLimiter, (req, res) => {
   const q = (req.query.q || '').trim();
   if (!q) {
-    return res.json({ success: false, error: '请输入域名' });
+    return res.json({ success: false, error: '请输入域名，示例: /api/resolve4?q=example.com' });
   }
 
   respond(req, res,
@@ -313,7 +313,7 @@ app.get('/api/resolve4', dnsLimiter, (req, res) => {
 app.get('/api/resolve4.txt', dnsLimiter, (req, res) => {
   res.type('text/plain; charset=utf-8');
   const q = (req.query.q || '').trim();
-  if (!q) return res.status(400).send('error: 请输入域名');
+  if (!q)     return res.status(400).send('error: 请输入域名，示例: /api/resolve4.txt?q=example.com');
   ipdb.resolveIPv4(q)
     .then(addrs => {
       if (!addrs || addrs.length === 0) return res.status(404).send('error: 该域名无 IPv4 记录');
@@ -326,7 +326,7 @@ app.get('/api/resolve4.txt', dnsLimiter, (req, res) => {
 app.get('/api/resolve6', dnsLimiter, (req, res) => {
   const q = (req.query.q || '').trim();
   if (!q) {
-    return res.json({ success: false, error: '请输入域名' });
+    return res.json({ success: false, error: '请输入域名，示例: /api/resolve6?q=example.com' });
   }
 
   respond(req, res,
@@ -360,7 +360,7 @@ app.get('/api/resolve6', dnsLimiter, (req, res) => {
 app.get('/api/resolve6.txt', dnsLimiter, (req, res) => {
   res.type('text/plain; charset=utf-8');
   const q = (req.query.q || '').trim();
-  if (!q) return res.status(400).send('error: 请输入域名');
+  if (!q) return res.status(400).send('error: 请输入域名，示例: /api/resolve6.txt?q=example.com');
   ipdb.resolveIPv6(q)
     .then(addrs => {
       if (!addrs || addrs.length === 0) return res.status(404).send('error: 该域名无 IPv6 记录');
@@ -373,7 +373,7 @@ app.get('/api/resolve6.txt', dnsLimiter, (req, res) => {
 app.get('/api/query', dnsLimiter, (req, res) => {
   const q = (req.query.q || '').trim();
   if (!q) {
-    return res.json({ success: false, error: '请输入IP地址或域名' });
+    return res.json({ success: false, error: '请输入IP地址或域名，示例: /api/query?q=8.8.8.8' });
   }
 
   respond(req, res,
@@ -392,7 +392,7 @@ app.get('/api/query', dnsLimiter, (req, res) => {
 app.get('/api/query.txt', dnsLimiter, (req, res) => {
   res.type('text/plain; charset=utf-8');
   const q = (req.query.q || '').trim();
-  if (!q) return res.status(400).send('error: 请输入IP地址或域名');
+  if (!q) return res.status(400).send('error: 请输入IP地址或域名，示例: /api/query.txt?q=8.8.8.8');
   
   ipdb.queryWithResolve(q).then(data => {
     if (!data || !data.success) {
@@ -425,7 +425,7 @@ app.get('/api/info', limiter, (req, res) => {
 app.post('/api/batch', limiter, (req, res) => {
   const { ips } = req.body || {};
   if (!ips || !Array.isArray(ips) || ips.length === 0) {
-    return res.json({ success: false, error: '请输入 IP 地址数组' });
+    return res.json({ success: false, error: '请提交 IP 地址数组，示例: {"ips":["8.8.8.8","1.1.1.1"]}' });
   }
   if (ips.length > 50) {
     return res.json({ success: false, error: '单次最多查询 50 个 IP' });
