@@ -311,5 +311,23 @@ function escHtml(str) { const d = document.createElement('div'); d.textContent =
     });
 })();
 </script>
+<script>
+// 将请求示例转为可点击的超链接（带完整访问地址）
+(function(){
+  var origin = location.origin;
+  document.querySelectorAll('.example-row .url').forEach(function(el){
+    var path = el.textContent.trim();
+    var a = document.createElement('a');
+    a.href = origin + path;
+    a.textContent = path;
+    a.style.color = '#6c63ff';
+    a.style.textDecoration = 'none';
+    a.target = '_blank';
+    a.rel = 'noopener';
+    a.title = origin + path;
+    el.parentNode.replaceChild(a, el);
+  });
+})();
+</script>
 </body>
 </html>

@@ -282,7 +282,7 @@ async function loadStats(){
       entries.forEach(function(e){
         var pct = Math.round(e[1] / maxVal * 100);
         h += '<tr>' +
-          '<td><code style="color:#8b7dff;font-size:13px;">/api/' + esc(e[0]) + '</code>' +
+          '<td><a href="/api/' + esc(e[0]) + '" target="_blank" style="color:#8b7dff;text-decoration:none;font-size:13px;">/api/' + esc(e[0]) + '</a>' +
           '<span class="bar-wrap"><span class="bar-fill" style="width:' + pct + '%"></span></span></td>' +
           '<td class="count">' + e[1] + '</td>' +
           '</tr>';
