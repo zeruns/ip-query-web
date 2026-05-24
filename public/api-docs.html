@@ -8,7 +8,7 @@
   <meta name="keywords" content="IP查询API,IP归属地API,本机IP接口,公网IP接口,域名解析API,地理位置API">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="">
-  <script src="/config.js"></script>
+  <meta name="site-url" content="https://ip-query.zeruns.com">
   <link rel="icon" type="image/png" href="/favicon.png">
   <link rel="shortcut icon" href="/favicon.ico">
   <style>
@@ -293,8 +293,7 @@ function escHtml(str) { const d = document.createElement('div'); d.textContent =
 </script>
 <script>
 (function(){
-  var cfg = window.SITE_CONFIG || {};
-  var siteUrl = cfg.siteURL || location.origin;
+  var siteUrl = document.querySelector('meta[name="site-url"]')?.content || location.origin;
   var canonical = document.querySelector('link[rel="canonical"]');
   if (canonical) canonical.href = siteUrl + location.pathname;
 
@@ -316,11 +315,6 @@ function escHtml(str) { const d = document.createElement('div'); d.textContent =
     .then(function(r){ return r.text(); })
     .then(function(html){
       document.getElementById('footer').innerHTML = html;
-      var beian = (window.SITE_CONFIG || {}).icpBeian;
-      if (beian) {
-        var el = document.getElementById('footer');
-        el.innerHTML += '<div style="text-align:center;margin-top:4px;"><a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener" style="color:rgba(255,255,255,0.12);font-size:11px;">' + beian + '</a></div>';
-      }
     });
 })();
 </script>

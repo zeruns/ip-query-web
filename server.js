@@ -101,16 +101,6 @@ app.use((req, res, next) => {
 // JSON 解析
 app.use(express.json());
 
-// 站点配置（注入到前端）
-app.get('/config.js', (req, res) => {
-  res.type('application/javascript');
-  const cfg = JSON.stringify({
-    siteURL: config.siteURL,
-    icpBeian: config.icpBeian
-  });
-  res.send('window.SITE_CONFIG=' + cfg + ';');
-});
-
 // 静态文件
 app.use(express.static(path.join(__dirname, 'public')));
 

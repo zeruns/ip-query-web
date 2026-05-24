@@ -8,7 +8,7 @@
   <meta name="keywords" content="网站统计,PV,API调用统计">
   <meta name="robots" content="noindex, nofollow">
   <link rel="canonical" href="">
-  <script src="/config.js"></script>
+  <meta name="site-url" content="https://ip-query.zeruns.com">
   <link rel="icon" type="image/png" href="/favicon.png">
   <link rel="shortcut icon" href="/favicon.ico">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -161,8 +161,7 @@
 <script>
 // ── 组件加载 ──
 (function(){
-  var cfg = window.SITE_CONFIG || {};
-  var siteUrl = cfg.siteURL || location.origin;
+  var siteUrl = document.querySelector('meta[name="site-url"]')?.content || location.origin;
   var canonical = document.querySelector('link[rel="canonical"]');
   if (canonical) canonical.href = siteUrl + location.pathname;
 
@@ -184,11 +183,6 @@
     .then(function(r){ return r.text(); })
     .then(function(html){
       document.getElementById('footer').innerHTML = html;
-      var beian = (window.SITE_CONFIG || {}).icpBeian;
-      if (beian) {
-        var el = document.getElementById('footer');
-        el.innerHTML += '<div style="text-align:center;margin-top:4px;"><a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener" style="color:rgba(255,255,255,0.12);font-size:11px;">' + beian + '</a></div>';
-      }
     });
 })();
 
