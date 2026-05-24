@@ -497,6 +497,7 @@ initGrid();
     .then(function(r){ return r.text(); })
     .then(function(html){
       document.getElementById('footer').innerHTML = html;
+      if (window.I18N) I18N.applyAll();
     });
 })();
 </script>

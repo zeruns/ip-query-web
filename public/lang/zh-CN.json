@@ -6,29 +6,29 @@
     "stats": "统计"
   },
   "footer": {
-    "friendLinks": "友情链接",
+    "friendLinks": "🔗 友情链接",
     "aiNotice": "本站由 AI 辅助编写",
     "dataSource": "数据来源",
     "openSource": "开源地址",
     "beian": "粤ICP备19152792号"
   },
   "home": {
-    "title": "纯真IP库查询·IP地理位置查询·本机IP查询",
+    "title": "🌐 纯真IP库查询·IP地理位置查询·本机IP查询",
     "subtitle": "支持 IPv4 / IPv6 / 域名解析 · 数据来源: 纯真(CZ88.NET)",
     "searchPlaceholder": "输入IP地址或域名，如 114.114.114.114",
-    "searchBtn": "查询",
-    "queryMyIP": "查询我的IP",
+    "searchBtn": "🔍 查询",
+    "queryMyIP": "📍 查询我的IP",
     "quickSearch": "快速查询",
     "loading": "正在查询...",
-    "resultCountry": "国家",
-    "resultRegion": "省份",
-    "resultCity": "城市",
-    "resultDistrict": "区县",
-    "resultISP": "运营商",
-    "resultOwner": "所有者",
-    "resultType": "类型",
-    "resultBitmask": "子网掩码",
-    "otherIPs": "其他解析地址",
+    "resultCountry": "🌍 国家",
+    "resultRegion": "📍 省份",
+    "resultCity": "🏙️ 城市",
+    "resultDistrict": "🏘️ 区县",
+    "resultISP": "🏢 运营商",
+    "resultOwner": "🔧 所有者",
+    "resultType": "📋 类型",
+    "resultBitmask": "🔢 子网掩码",
+    "otherIPs": "📡 其他解析地址",
     "clickExpand": "点击展开详情",
     "queryLabel": "查询",
     "noResult": "未找到该IP对应的地理位置信息",
@@ -36,17 +36,17 @@
     "getIPFailed": "获取本机 IP 失败"
   },
   "apiDocs": {
-    "title": "API 接口文档",
+    "title": "📖 API 接口文档",
     "subtitle": "所有接口支持 JSON 和纯文本（后缀 .txt）双格式",
-    "sectionRequest": "请求示例",
-    "btnTest": "测试",
-    "btnTesting": "测试中..."
+    "sectionRequest": "📎 请求示例",
+    "btnTest": "▶ 测试",
+    "btnTesting": "⏳ 测试中..."
   },
   "apiRecommend": {
-    "title": "第三方IP查询API对比",
+    "title": "🔗 第三方 IP 查询 API 推荐",
     "subtitle": "国内外主流IP查询API横向对比",
-    "queryMyIP": "查询我的IP",
-    "queryBtn": "查询",
+    "queryMyIP": "📍 查询我的IP",
+    "queryBtn": "🚀 开始查询",
     "ipPlaceholder": "输入IP地址（留空查本机）",
     "loading": "正在从各 API 获取数据...",
     "noData": "暂无数据",
@@ -54,7 +54,7 @@
     "success": "成功"
   },
   "stats": {
-    "title": "网站统计",
+    "title": "📊 网站统计",
     "subtitle": "页面访问量 & API 调用次数",
     "todayPV": "今日 PV",
     "todayAPI": "今日 API 调用",
@@ -64,11 +64,11 @@
     "tab7Days": "7 天",
     "tab30Days": "30 天",
     "tab1Year": "1 年",
-    "chartDaily": "每日明细",
-    "chartMonthly": "月度统计",
-    "chartAPIRank": "API 接口排行",
-    "clickTabHint": "点击上方标签查看数据",
-    "clickToLoad": "点击「今日」「7天」「30天」「1年」加载数据",
+    "chartDaily": "📅 每日明细",
+    "chartMonthly": "📅 月度统计",
+    "chartAPIRank": "🔌 API 接口排行",
+    "clickTabHint": "📅 点击上方标签查看数据",
+    "clickToLoad": "👆 点击「今日」「7天」「30天」「1年」加载数据",
     "loading": "加载中...",
     "noData": "暂无数据",
     "datePrefix": "日期",
@@ -80,7 +80,7 @@
     "loadFailed": "加载失败"
   },
   "apiList": {
-    "ipapiDesc": "IPIP.NET 商业 IP 数据库厂商提供的免费查询接口，无需注册，返回纯文本（当前 IP + 地理位置）。仅支持查询访问者自身 IP，不支持查询指定 IP 地址。",
+    "ipapiDesc": "IPIP.NET 商业 IP 数据库厂商提供的免费查询接口，无需注册，返回纯文本（当前 IP + 地理位置）。仅支持查询访问者自身 IP，不支持查询指定 IP 地址。2024年新增限制需传 UA Header。",
     "ipapiDescShort": "IPIP.NET 商业IP数据库免费接口",
     "ipapi1Desc": "无需注册，免费调用。限制：45次/分钟。免费版仅支持 HTTP（HTTPS 需付费）。支持语言参数 lang=zh-CN。返回 JSON/XML/CSV 格式。",
     "ipapi1Name": "ip-api.com",
@@ -126,5 +126,11 @@
     "dnsNoRecord": "解析失败",
     "domainNoRecord": "该域名无 DNS 记录",
     "queryFailed": "查询失败"
+  },
+  "apiDesc": {
+    "ipip": "IPIP.NET 商业 IP 数据库厂商提供的免费查询接口，无需注册，返回纯文本（当前 IP + 地理位置）。仅支持查询访问者自身 IP，不支持查询指定 IP 地址。2024年新增限制需传 UA Header。",
+    "ipapi": "无需注册，免费调用。限制：45次/分钟。免费版仅支持 HTTP（HTTPS 需付费）。支持语言参数 lang=zh-CN。返回 JSON/XML/CSV 格式。",
+    "ipsb": "无需注册，无明确频率限制。支持 IPv4/IPv6。返回 JSON 格式。国内访问可用。",
+    "geojsio": "开源免费，无需注册。支持 IPv4/IPv6。返回 JSON 格式。"
   }
 }

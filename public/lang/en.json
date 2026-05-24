@@ -6,29 +6,29 @@
     "stats": "Stats"
   },
   "footer": {
-    "friendLinks": "Links",
+    "friendLinks": "🔗 Links",
     "aiNotice": "AI-assisted website",
     "dataSource": "Data Source",
     "openSource": "Source Code",
     "beian": "Yue ICP Bei 19152792"
   },
   "home": {
-    "title": "CZ88 IP Lookup · IP Geolocation · My IP Address",
+    "title": "🌐 CZ88 IP Lookup · IP Geolocation · My IP Address",
     "subtitle": "Supports IPv4 / IPv6 / Domain Resolution · Data: CZ88.NET",
     "searchPlaceholder": "Enter an IP address or domain, e.g. 114.114.114.114",
-    "searchBtn": "Lookup",
-    "queryMyIP": "My IP",
+    "searchBtn": "🔍 Lookup",
+    "queryMyIP": "📍 My IP",
     "quickSearch": "Quick Lookup",
     "loading": "Looking up...",
-    "resultCountry": "Country",
-    "resultRegion": "Region",
-    "resultCity": "City",
-    "resultDistrict": "District",
-    "resultISP": "ISP",
-    "resultOwner": "Owner",
-    "resultType": "Type",
-    "resultBitmask": "Subnet Mask",
-    "otherIPs": "Other Resolved Addresses",
+    "resultCountry": "🌍 Country",
+    "resultRegion": "📍 Region",
+    "resultCity": "🏙️ City",
+    "resultDistrict": "🏘️ District",
+    "resultISP": "🏢 ISP",
+    "resultOwner": "🔧 Owner",
+    "resultType": "📋 Type",
+    "resultBitmask": "🔢 Subnet Mask",
+    "otherIPs": "📡 Other Resolved Addresses",
     "clickExpand": "Click to expand details",
     "queryLabel": "Lookup",
     "noResult": "No geolocation data found for this IP",
@@ -36,17 +36,17 @@
     "getIPFailed": "Failed to get your IP address"
   },
   "apiDocs": {
-    "title": "API Documentation",
+    "title": "📖 API Documentation",
     "subtitle": "All endpoints support JSON and plain text (.txt suffix) formats",
-    "sectionRequest": "Example Request",
-    "btnTest": "Test",
-    "btnTesting": "Testing..."
+    "sectionRequest": "📎 Example Request",
+    "btnTest": "▶ Test",
+    "btnTesting": "⏳ Testing..."
   },
   "apiRecommend": {
-    "title": "Third-party IP API Comparison",
+    "title": "🔗 Third-party IP API Comparison",
     "subtitle": "Side-by-side comparison of popular IP geolocation APIs",
-    "queryMyIP": "My IP",
-    "queryBtn": "Query",
+    "queryMyIP": "📍 My IP",
+    "queryBtn": "🚀 Query",
     "ipPlaceholder": "Enter an IP address (leave blank to query your own)",
     "loading": "Fetching data from APIs...",
     "noData": "No data",
@@ -54,7 +54,7 @@
     "success": "Success"
   },
   "stats": {
-    "title": "Site Statistics",
+    "title": "📊 Site Statistics",
     "subtitle": "Page views & API calls",
     "todayPV": "Today PV",
     "todayAPI": "Today API Calls",
@@ -64,11 +64,11 @@
     "tab7Days": "7 Days",
     "tab30Days": "30 Days",
     "tab1Year": "1 Year",
-    "chartDaily": "Daily Breakdown",
-    "chartMonthly": "Monthly Summary",
-    "chartAPIRank": "API Endpoint Ranking",
-    "clickTabHint": "Click the tabs above to view data",
-    "clickToLoad": "Click Today / 7 Days / 30 Days / 1 Year to load data",
+    "chartDaily": "📅 Daily Breakdown",
+    "chartMonthly": "📅 Monthly Summary",
+    "chartAPIRank": "🔌 API Endpoint Ranking",
+    "clickTabHint": "📅 Click the tabs above to view data",
+    "clickToLoad": "👆 Click Today / 7 Days / 30 Days / 1 Year to load data",
     "loading": "Loading...",
     "noData": "No data",
     "datePrefix": "Date",
@@ -126,5 +126,11 @@
     "dnsNoRecord": "Resolution failed",
     "domainNoRecord": "No DNS records for this domain",
     "queryFailed": "Query failed"
+  },
+  "apiDesc": {
+    "ipip": "Free query API from IPIP.NET, a commercial IP database vendor. No registration required. Returns plain text (current IP + location). Only supports querying the visitor's own IP; does not support querying specified IPs. Added UA header requirement in 2024.",
+    "ipapi": "No registration required, free to use. Limit: 45 req/min. Free tier HTTP only (HTTPS requires paid plan). Supports lang=zh-CN. Returns JSON/XML/CSV formats.",
+    "ipsb": "No registration, no explicit rate limit. Supports IPv4/IPv6. Returns JSON format. Accessible from China.",
+    "geojsio": "Open source and free, no registration required. Supports IPv4/IPv6. Returns JSON format."
   }
 }

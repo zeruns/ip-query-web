@@ -486,6 +486,8 @@ function toggleDetail(idx, entryEl) {
     .then(function(r){ return r.text(); })
     .then(function(html){
       document.getElementById('footer').innerHTML = html;
+      // 组件加载后重新应用翻译
+      if (window.I18N) I18N.applyAll();
     });
 })();
 </script>

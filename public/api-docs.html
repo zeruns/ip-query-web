@@ -140,8 +140,8 @@
 
   <!-- 1 -->
   <div class="api-card">
-    <div class="api-card-header"><div class="api-card-number">1</div><div class="api-card-title">综合查询</div></div>
-    <div class="api-desc">支持 IP 地址和域名查询，自动识别类型，返回详细地理位置信息。推荐使用此接口进行所有查询。</div>
+    <div class="api-card-header"><div class="api-card-number">1</div><div class="api-card-title" data-i18n="apiDetail.card1Title">综合查询（推荐）</div></div>
+    <div class="api-desc" data-i18n="apiDetail.card1Desc">支持 IP 地址和域名查询，自动识别类型，返回详细地理位置信息。推荐使用此接口进行所有查询。</div>
     <div class="endpoint-row"><span class="method">GET</span> <span class="path">/api/query?q=<span class="param">{ip或域名}</span></span> <span class="ftag ftag-json">JSON</span></div>
     <div class="endpoint-row"><span class="method">GET</span> <span class="path">/api/query.txt?q=<span class="param">{ip或域名}</span></span> <span class="ftag ftag-txt">TXT</span></div>
     <div class="section-label" data-i18n="apiDocs.sectionRequest">📎 请求示例</div>
@@ -152,8 +152,8 @@
 
   <!-- 2 -->
   <div class="api-card">
-    <div class="api-card-header"><div class="api-card-number">2</div><div class="api-card-title">获取本机公网 IP</div></div>
-    <div class="api-desc">返回当前请求来源的公网 IP 地址，无需任何参数。</div>
+    <div class="api-card-header"><div class="api-card-number">2</div><div class="api-card-title" data-i18n="apiDetail.card2Title">获取本机IP</div></div>
+    <div class="api-desc" data-i18n="apiDetail.card2Desc">返回当前请求来源的 IP 地址，无需任何参数。</div>
     <div class="endpoint-row"><span class="method">GET</span> <span class="path">/api/myip</span> <span class="ftag ftag-json">JSON</span></div>
     <div class="endpoint-row"><span class="method">GET</span> <span class="path">/api/myip.txt</span> <span class="ftag ftag-txt">TXT</span></div>
     <div class="section-label" data-i18n="apiDocs.sectionRequest">📎 请求示例</div>
@@ -163,8 +163,8 @@
 
   <!-- 3 -->
   <div class="api-card">
-    <div class="api-card-header"><div class="api-card-number">3</div><div class="api-card-title">输入 IP 查地理位置</div></div>
-    <div class="api-desc">根据指定的 IP 地址查询其地理位置信息。仅支持 IP，不支持域名。</div>
+    <div class="api-card-header"><div class="api-card-number">3</div><div class="api-card-title" data-i18n="apiDetail.card3Title">IP地址查地理位置</div></div>
+    <div class="api-desc" data-i18n="apiDetail.card3Desc">根据指定的 IP 地址查询其地理位置信息。仅支持 IP，不支持域名。</div>
     <div class="endpoint-row"><span class="method">GET</span> <span class="path">/api/location?q=<span class="param">{ip}</span></span> <span class="ftag ftag-json">JSON</span></div>
     <div class="endpoint-row"><span class="method">GET</span> <span class="path">/api/location.txt?q=<span class="param">{ip}</span></span> <span class="ftag ftag-txt">TXT</span></div>
     <div class="section-label" data-i18n="apiDocs.sectionRequest">📎 请求示例</div>
@@ -174,8 +174,8 @@
 
   <!-- 4 -->
   <div class="api-card">
-    <div class="api-card-header"><div class="api-card-number">4</div><div class="api-card-title">获取访问者地理位置</div></div>
-    <div class="api-desc">返回服务端看到的请求来源 IP 及其地理位置。通过 Tailscale/代理访问时，显示的是隧道入口 IP（如 <code>100.x.x.x</code>），非客户端真实公网 IP。</div>
+    <div class="api-card-header"><div class="api-card-number">4</div><div class="api-card-title" data-i18n="apiDetail.card4Title">获取访问者地理位置</div></div>
+    <div class="api-desc" data-i18n="apiDetail.card4Desc">返回服务端看到的请求来源 IP 及其地理位置。通过 Tailscale/代理访问时，显示的是隧道入口 IP（如 <code>100.x.x.x</code>），非客户端真实公网 IP。</div>
     <div class="endpoint-row"><span class="method">GET</span> <span class="path">/api/mylocation</span> <span class="ftag ftag-json">JSON</span></div>
     <div class="endpoint-row"><span class="method">GET</span> <span class="path">/api/mylocation.txt</span> <span class="ftag ftag-txt">TXT</span></div>
     <div class="section-label" data-i18n="apiDocs.sectionRequest">📎 请求示例</div>
@@ -185,8 +185,8 @@
 
   <!-- 5 -->
   <div class="api-card">
-    <div class="api-card-header"><div class="api-card-number">5</div><div class="api-card-title">域名解析 IPv4</div></div>
-    <div class="api-desc">解析指定域名的所有 IPv4 地址（A 记录），JSON 格式返回数量和 IP 列表。</div>
+    <div class="api-card-header"><div class="api-card-number">5</div><div class="api-card-title" data-i18n="apiDetail.card5Title">域名解析 IPv4</div></div>
+    <div class="api-desc" data-i18n="apiDetail.card5Desc">解析指定域名的所有 IPv4 地址（A 记录），JSON 格式返回数量和 IP 列表。</div>
     <div class="endpoint-row"><span class="method">GET</span> <span class="path">/api/resolve4?q=<span class="param">{域名}</span></span> <span class="ftag ftag-json">JSON</span></div>
     <div class="endpoint-row"><span class="method">GET</span> <span class="path">/api/resolve4.txt?q=<span class="param">{域名}</span></span> <span class="ftag ftag-txt">TXT</span></div>
     <div class="section-label" data-i18n="apiDocs.sectionRequest">📎 请求示例</div>
@@ -196,8 +196,8 @@
 
   <!-- 6 -->
   <div class="api-card">
-    <div class="api-card-header"><div class="api-card-number">6</div><div class="api-card-title">域名解析 IPv6</div></div>
-    <div class="api-desc">解析指定域名的所有 IPv6 地址（AAAA 记录），JSON 格式返回数量和 IP 列表。</div>
+    <div class="api-card-header"><div class="api-card-number">6</div><div class="api-card-title" data-i18n="apiDetail.card6Title">域名解析 IPv6</div></div>
+    <div class="api-desc" data-i18n="apiDetail.card6Desc">解析指定域名的所有 IPv6 地址（AAAA 记录），JSON 格式返回数量和 IP 列表。</div>
     <div class="endpoint-row"><span class="method">GET</span> <span class="path">/api/resolve6?q=<span class="param">{域名}</span></span> <span class="ftag ftag-json">JSON</span></div>
     <div class="endpoint-row"><span class="method">GET</span> <span class="path">/api/resolve6.txt?q=<span class="param">{域名}</span></span> <span class="ftag ftag-txt">TXT</span></div>
     <div class="section-label" data-i18n="apiDocs.sectionRequest">📎 请求示例</div>
@@ -207,8 +207,8 @@
 
   <!-- 7 -->
   <div class="api-card">
-    <div class="api-card-header"><div class="api-card-number">7</div><div class="api-card-title">获取 IP 库信息</div></div>
-    <div class="api-desc">返回当前使用的纯真 IP 库的版本号和描述信息。</div>
+    <div class="api-card-header"><div class="api-card-number">7</div><div class="api-card-title" data-i18n="apiDetail.card7Title">获取 IP 库信息</div></div>
+    <div class="api-desc" data-i18n="apiDetail.card7Desc">返回当前使用的纯真 IP 库的版本号和描述信息。</div>
     <div class="endpoint-row"><span class="method">GET</span> <span class="path">/api/info</span> <span class="ftag ftag-json">JSON</span></div>
     <div class="section-label" data-i18n="apiDocs.sectionRequest">📎 请求示例</div>
     <div class="example-row" data-path="/api/info"><span class="url">/api/info</span><button class="btn-test" onclick="testAPI(this)" data-i18n="apiDocs.btnTest">▶ 测试</button><div class="test-result"></div></div>
@@ -216,8 +216,8 @@
 
   <!-- 8 -->
   <div class="api-card">
-    <div class="api-card-header"><div class="api-card-number">8</div><div class="api-card-title">IP 库状态</div></div>
-    <div class="api-desc">返回当前 IP 数据库的运行状态、版本和文件信息。</div>
+    <div class="api-card-header"><div class="api-card-number">8</div><div class="api-card-title" data-i18n="apiDetail.card8Title">IP 库状态</div></div>
+    <div class="api-desc" data-i18n="apiDetail.card8Desc">返回当前 IP 数据库的运行状态、版本和文件信息。</div>
     <div class="endpoint-row"><span class="method">GET</span> <span class="path">/api/status</span> <span class="ftag ftag-json">JSON</span></div>
     <div class="section-label" data-i18n="apiDocs.sectionRequest">📎 请求示例</div>
     <div class="example-row" data-path="/api/status"><span class="url">/api/status</span><button class="btn-test" onclick="testAPI(this)" data-i18n="apiDocs.btnTest">▶ 测试</button><div class="test-result"></div></div>
@@ -318,6 +318,7 @@ function escHtml(str) { const d = document.createElement('div'); d.textContent =
     .then(function(r){ return r.text(); })
     .then(function(html){
       document.getElementById('footer').innerHTML = html;
+      if (window.I18N) I18N.applyAll();
     });
 })();
 </script>

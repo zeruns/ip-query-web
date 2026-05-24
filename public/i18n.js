@@ -91,6 +91,8 @@
 
   // 公开 t() 方法供页面 JS 使用
   I18N.t = getTranslation;
+  // 公开 apply 供组件加载后重新翻译
+  I18N.applyAll = apply;
 
   // 切换语言
   I18N.switchTo = function(lang, cb) {
