@@ -228,11 +228,17 @@ const API_SOURCES = [
     name: 'IPIP.NET',
     url: () => `https://myip.ipip.net`,
     parse: d => {
-      // 返回纯文本格式：当前 IP：110.42.101.53  来自于：中国 浙江 宁波  电信
+      // 返回纯文本：当前 IP：110.42.101.53  来自于：中国 浙江 宁波  电信
       const text = typeof d === 'string' ? d : '';
       const ipm = text.match(/IP[：:]\s*([\d.:a-fA-F]+)/);
       const locm = text.match(/来自于[：:]\s*(.+)/);
-      return { ip: ipm ? ipm[1] : '', location: locm ? locm[1].trim() : text.trim() };
+      if (!locm) return { ip: ipm ? ipm[1] : '', location: text.trim() };
+      const parts = locm[1].trim().split(/\s+/);
+      const country = parts[0] || '';
+      const region = parts[1] || '';
+      const city = parts[2] || '';
+      const isp = parts.slice(3).join(' ') || '';
+      return { ip: ipm ? ipm[1] : '', country, region, city, isp, timezone: '' };
     },
     link: 'https://www.ipip.net/',
     doc: 'IPIP.NET 商业 IP 数据库厂商提供的免费查询接口，无需注册，返回纯文本（当前 IP + 地理位置）。仅支持查询访问者自身 IP，不支持查询指定 IP 地址。2024年新增限制需传 UA Header。'
