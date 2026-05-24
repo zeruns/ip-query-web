@@ -7,6 +7,7 @@
   <meta name="robots" content="noindex, nofollow">
   <link rel="icon" type="image/png" href="/favicon.png">
   <link rel="shortcut icon" href="/favicon.ico">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
     * { margin:0; padding:0; box-sizing:border-box; }
     body {
@@ -19,15 +20,10 @@
     .navbar {
       position: fixed; top:0; left:0; right:0; z-index:100;
       background: rgba(15,12,41,0.85);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
       border-bottom: 1px solid rgba(255,255,255,0.06);
-      padding: 0 20px;
-      height: 56px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
+      padding: 0 20px; height: 56px;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
     }
     .navbar a { color: rgba(255,255,255,0.5); text-decoration: none; padding: 8px 18px; border-radius: 8px; font-size: 14px; transition: all 0.2s; }
     .navbar a:hover { color: #fff; background: rgba(255,255,255,0.06); }
@@ -38,21 +34,16 @@
     h1 { text-align: center; font-size: 24px; margin-bottom: 6px; background: linear-gradient(90deg, #6c63ff, #b388ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .subtitle { text-align: center; color: rgba(255,255,255,0.4); font-size: 13px; margin-bottom: 28px; }
 
-    /* 指标卡片 */
     .metrics-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
     .metric-card {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 14px;
-      padding: 18px;
-      text-align: center;
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px; padding: 18px; text-align: center;
     }
     .metric-value { font-size: 26px; font-weight: 700; line-height: 1.2; }
-    .metric-label { color: rgba(255,255,255,0.35); font-size: 12px; margin-top: 4px; text-transform: uppercase; letter-spacing: 1px; }
+    .metric-label { color: rgba(255,255,255,0.35); font-size: 12px; margin-top: 4px; letter-spacing: 1px; }
     .metric-card.pv .metric-value { color: #8b7dff; }
     .metric-card.api .metric-value { color: #00c896; }
 
-    /* Tab 切换 */
     .tab-row { display: flex; gap: 6px; margin-bottom: 20px; justify-content: center; }
     .tab-btn {
       padding: 8px 20px; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;
@@ -61,35 +52,29 @@
     .tab-btn:hover { color: #fff; border-color: rgba(255,255,255,0.2); }
     .tab-btn.active { color: #8b7dff; border-color: rgba(108,99,255,0.4); background: rgba(108,99,255,0.1); font-weight: 600; }
 
-    /* 表格 */
-    .table-wrap { overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; font-size: 14px; }
-    th, td { padding: 10px 14px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); }
-    th { color: rgba(255,255,255,0.35); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; white-space: nowrap; }
-    td { color: rgba(255,255,255,0.8); }
-    td.date { color: rgba(255,255,255,0.5); font-size: 13px; text-align: left; }
-    td.count { color: #8b7dff; font-weight: 600; }
-    td.zero { color: rgba(255,255,255,0.15); }
-    tr:hover td { background: rgba(255,255,255,0.02); }
-
-    /* API 排行 */
-    .api-table th { text-align: left; }
-    .api-table td { text-align: left; }
-    .api-table td.count { text-align: right; font-weight: 400; }
-    .bar-wrap { display: inline-block; width: 100%; max-width: 200px; height: 6px; background: rgba(255,255,255,0.06); border-radius: 3px; vertical-align: middle; margin-left: 10px; }
-    .bar-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, #6c63ff, #8b7dff); transition: width 0.5s ease; }
-
     .card {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 16px;
-      padding: 24px;
-      margin-bottom: 18px;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px; padding: 24px; margin-bottom: 18px;
     }
-    .card-title { color: rgba(255,255,255,0.5); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
+    .card-title { color: rgba(255,255,255,0.5); font-size: 12px; letter-spacing: 1px; margin-bottom: 16px; }
+
+    .chart-wrap { position: relative; width: 100%; height: 320px; }
+    .chart-wrap canvas { width: 100% !important; height: 100% !important; }
 
     .loading { text-align: center; padding: 40px; color: rgba(255,255,255,0.3); }
     .empty { text-align: center; padding: 40px; color: rgba(255,255,255,0.2); font-size: 14px; }
+
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { padding: 10px 14px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    th { color: rgba(255,255,255,0.35); font-size: 11px; letter-spacing: 1px; font-weight: 600; white-space: nowrap; }
+    td { color: rgba(255,255,255,0.8); }
+
+    .api-table th { text-align: left; }
+    .api-table td { text-align: left; }
+    .api-table td.count { text-align: right; font-weight: 600; color: #8b7dff; }
+    .bar-wrap { display: inline-block; width: 100%; max-width: 200px; height: 6px; background: rgba(255,255,255,0.06); border-radius: 3px; vertical-align: middle; margin-left: 10px; }
+    .bar-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, #6c63ff, #8b7dff); transition: width 0.5s ease; }
 
     .footer { text-align: center; margin-top: 24px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,0.06); color: rgba(255,255,255,0.2); font-size: 12px; line-height: 1.8; }
     .footer a { color: rgba(108,99,255,0.5); text-decoration: none; transition: color 0.2s; }
@@ -99,7 +84,6 @@
     @media (max-width: 600px) {
       .metrics-row { grid-template-columns: repeat(2, 1fr); }
       .metric-value { font-size: 22px; }
-      th, td { padding: 8px 10px; font-size: 13px; }
     }
   </style>
 </head>
@@ -136,10 +120,12 @@
   </div>
 
   <div class="card">
-    <div class="card-title">📅 每日明细</div>
+    <div class="card-title" id="chartTitle">📅 每日明细</div>
     <div class="loading" id="loading">加载中...</div>
     <div class="empty" id="empty" style="display:none">暂无数据</div>
-    <div class="table-wrap" id="dailyTable" style="display:none"></div>
+    <div class="chart-wrap" id="chartWrap" style="display:none">
+      <canvas id="statsChart"></canvas>
+    </div>
   </div>
 
   <div class="card">
@@ -151,6 +137,7 @@
 </div>
 
 <script>
+// ── 组件加载 ──
 (function(){
   var path = location.pathname;
   var activeNav = 'home';
@@ -173,8 +160,23 @@
     });
 })();
 
-// ── Tab 切换 ──
+function $(id){ return document.getElementById(id); }
+function esc(s){ var d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+// ── Chart.js 暗色主题 ──
+var darkTheme = {
+  fontColor: 'rgba(255,255,255,0.4)',
+  gridColor: 'rgba(255,255,255,0.06)',
+  pvColor: '#8b7dff',
+  pvBgColor: 'rgba(139,125,255,0.1)',
+  apiColor: '#00c896',
+  apiBgColor: 'rgba(0,200,150,0.3)'
+};
+
+var chart = null;
 var currentRange = 'daily';
+
+// ── Tab 切换 ──
 var tabs = document.querySelectorAll('.tab-btn');
 tabs.forEach(function(btn){
   btn.addEventListener('click', function(){
@@ -185,45 +187,58 @@ tabs.forEach(function(btn){
   });
 });
 
-function $(id){ return document.getElementById(id); }
-function esc(s){ var d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
-
 async function loadStats(){
   $('loading').style.display = 'block';
   $('empty').style.display = 'none';
-  $('dailyTable').style.display = 'none';
+  $('chartWrap').style.display = 'none';
+  if (chart) { chart.destroy(); chart = null; }
 
   try {
     var resp = await fetch('/api/stats?range=' + currentRange);
     var data = await resp.json();
     if (!data.success) { $('loading').style.display = 'none'; $('empty').style.display = 'block'; return; }
 
-    // 更新指标卡片
     var daily = data.daily;
+
+    // 更新指标卡片
     var today = daily[daily.length - 1];
     $('todayPV').textContent = today ? today.pageviews : '0';
     $('todayAPI').textContent = today ? today.api_calls : '0';
     $('totalPV').textContent = data.total_pv;
     $('totalAPI').textContent = data.total_api;
 
-    // 每日明细表
-    var hasData = daily.some(function(d){ return d.pageviews > 0 || d.api_calls > 0; });
+    // 构建图表数据
+    var labels = [], pvValues = [], apiValues = [];
+
+    if (currentRange === 'yearly') {
+      // 按月聚合
+      var monthly = {};
+      daily.forEach(function(d){
+        var m = d.date.substring(0, 7);
+        if (!monthly[m]) monthly[m] = { pv: 0, api: 0 };
+        monthly[m].pv += d.pageviews;
+        monthly[m].api += d.api_calls;
+      });
+      labels = Object.keys(monthly);
+      pvValues = labels.map(function(m){ return monthly[m].pv; });
+      apiValues = labels.map(function(m){ return monthly[m].api; });
+      $('chartTitle').textContent = '📅 月度统计';
+    } else {
+      labels = daily.map(function(d){ return d.date; });
+      pvValues = daily.map(function(d){ return d.pageviews; });
+      apiValues = daily.map(function(d){ return d.api_calls; });
+      $('chartTitle').textContent = '📅 每日明细';
+    }
+
+    var hasData = pvValues.some(function(v){ return v > 0; }) || apiValues.some(function(v){ return v > 0; });
+
     if (!hasData) {
       $('loading').style.display = 'none';
       $('empty').style.display = 'block';
     } else {
-      var html = '<table><thead><tr><th>日期</th><th>PV</th><th>API 调用</th></tr></thead><tbody>';
-      daily.forEach(function(d){
-        html += '<tr>' +
-          '<td class="date">' + d.date + '</td>' +
-          '<td class="count' + (d.pageviews === 0 ? ' zero' : '') + '">' + d.pageviews + '</td>' +
-          '<td class="count' + (d.api_calls === 0 ? ' zero' : '') + '">' + d.api_calls + '</td>' +
-          '</tr>';
-      });
-      html += '</tbody></table>';
-      $('dailyTable').innerHTML = html;
-      $('dailyTable').style.display = 'block';
       $('loading').style.display = 'none';
+      $('chartWrap').style.display = 'block';
+      renderChart(labels, pvValues, apiValues);
     }
 
     // API 排行表
@@ -250,6 +265,103 @@ async function loadStats(){
     $('empty').textContent = '加载失败: ' + e.message;
     $('empty').style.display = 'block';
   }
+}
+
+function renderChart(labels, pvData, apiData){
+  var ctx = $('statsChart').getContext('2d');
+
+  chart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'API 调用',
+          data: apiData,
+          backgroundColor: darkTheme.apiBgColor,
+          borderColor: darkTheme.apiColor,
+          borderWidth: 1,
+          borderRadius: 3,
+          order: 2,
+          yAxisID: 'y1'
+        },
+        {
+          label: 'PV',
+          data: pvData,
+          type: 'line',
+          borderColor: darkTheme.pvColor,
+          backgroundColor: darkTheme.pvBgColor,
+          fill: true,
+          tension: 0.3,
+          pointRadius: 3,
+          pointBackgroundColor: darkTheme.pvColor,
+          order: 1,
+          yAxisID: 'y'
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {
+        mode: 'index',
+        intersect: false
+      },
+      plugins: {
+        legend: {
+          labels: {
+            color: darkTheme.fontColor,
+            usePointStyle: true,
+            padding: 20,
+            font: { size: 13 }
+          }
+        },
+        tooltip: {
+          backgroundColor: 'rgba(15,12,41,0.95)',
+          titleColor: '#fff',
+          bodyColor: 'rgba(255,255,255,0.8)',
+          borderColor: 'rgba(255,255,255,0.1)',
+          borderWidth: 1
+        }
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: darkTheme.fontColor,
+            maxRotation: 45,
+            font: { size: 11 }
+          },
+          grid: { color: darkTheme.gridColor }
+        },
+        y: {
+          type: 'linear',
+          display: true,
+          position: 'left',
+          title: {
+            display: true,
+            text: 'PV',
+            color: darkTheme.pvColor
+          },
+          ticks: { color: darkTheme.fontColor },
+          grid: { color: darkTheme.gridColor },
+          beginAtZero: true
+        },
+        y1: {
+          type: 'linear',
+          display: true,
+          position: 'right',
+          title: {
+            display: true,
+            text: 'API',
+            color: darkTheme.apiColor
+          },
+          ticks: { color: darkTheme.fontColor },
+          grid: { drawOnChartArea: false },
+          beginAtZero: true
+        }
+      }
+    }
+  });
 }
 
 loadStats();
