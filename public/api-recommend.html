@@ -361,11 +361,11 @@ function initGrid() {
     card.innerHTML =
       '<div class="api-card-header">' +
         '<span class="api-card-name">' + esc(src.name) + '</span>' +
-        '<span class="api-card-status status-idle" id="status-' + src.id + '">待查询</span>' +
+        '<span class="api-card-status status-idle" data-i18n="apiRecommend.pending" id="status-' + src.id + '">待查询</span>' +
       '</div>' +
       '<div class="api-card-body" id="body-' + src.id + '">' +
-        '<div class="api-card-doc">📖 ' + esc((window.I18N && I18N.t('apiDesc.' + src.id)) || src.doc) + '</div>' +
-        '<div class="api-card-link"><a href="' + esc(src.link) + '" target="_blank" rel="noopener">🔗 访问官网</a></div>' +
+        '<div class="api-card-doc">📖 <span data-i18n="apiDesc.' + src.id + '">' + esc((window.I18N && I18N.t('apiDesc.' + src.id)) || src.doc) + '</span></div>' +
+        '<div class="api-card-link"><a href="' + esc(src.link) + '" target="_blank" rel="noopener" data-i18n="apiRecommend.visitSite">🔗 访问官网</a></div>' +
       '</div>';
     grid.appendChild(card);
   });

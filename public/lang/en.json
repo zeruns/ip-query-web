@@ -54,7 +54,9 @@
     "loading": "Fetching data from APIs...",
     "noData": "No data",
     "fail": "Failed",
-    "success": "Success"
+    "success": "Success",
+    "pending": "Pending",
+    "visitSite": "🔗 Visit Site"
   },
   "stats": {
     "title": "📊 Site Statistics",

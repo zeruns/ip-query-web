@@ -54,7 +54,9 @@
     "loading": "正在从各 API 获取数据...",
     "noData": "暂无数据",
     "fail": "失败",
-    "success": "成功"
+    "success": "成功",
+    "pending": "待查询",
+    "visitSite": "🔗 访问官网"
   },
   "stats": {
     "title": "📊 网站统计",
