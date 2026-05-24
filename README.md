@@ -46,6 +46,10 @@ docker compose up -d --build
 | `http://localhost:6688/api-docs.html` | API 文档（在线测试） |
 | `http://localhost:6688/stats.html` | 网站统计 |
 
+## 在线演示
+
+🔗 [https://ip-query.zeruns.com/](https://ip-query.zeruns.com/)
+
 ## 功能特性
 
 - **IPv4 / IPv6 双栈** — 同时支持两种协议的地理位置查询
@@ -100,22 +104,81 @@ node cli.js -6 ipv6.google.com  # 强制 IPv6
 
 ## 配置
 
-所有配置通过环境变量或 `.env` 文件管理。复制模板后按需修改：
+所有配置通过环境变量或 `.env` 文件管理。源码中配置位于 `src/config.js`，`.env.example` 包含完整模板。
 
 ```bash
-cp .env.example .env
+cp .env.example .env   # 复制默认配置
+vim .env               # 按需修改
 ```
+
+### 服务配置
 
 | 变量 | 默认值 | 说明 |
 |------|--------|------|
 | `PORT` | `6688` | 服务端口 |
-| `HOST` | `::` | 监听地址（`::`=双栈, `0.0.0.0`=仅IPv4） |
-| `RATE_LIMIT_MAX` | `120` | 普通 API 限流（次/分钟/IP） |
-| `RATE_LIMIT_DNS` | `30` | 域名解析接口限流 |
-| `GITHUB_MIRROR` | `https://gh-proxy.com/` | GitHub 镜像加速（国内必配） |
-| `CC_MAX_CONCURRENT` | `20` | 单 IP 最大并发连接数 |
-| `PUBLIC_DNS` | `8.8.8.8,8.8.4.4` | 域名解析用公共 DNS |
-| `LOG_LEVEL` | `info` | 日志级别 |
+| `HOST` | `::` | 监听地址：`::`=双栈（推荐）、`0.0.0.0`=仅IPv4、`127.0.0.1`=仅本地 |
+| `LOG_LEVEL` | `info` | 日志级别：`debug`、`info`、`warn`、`error` |
+
+### 限流配置
+
+| 变量 | 默认值 | 说明 |
+|------|--------|------|
+| `RATE_LIMIT_MAX` | `120` | 普通 API 查询限流（次/分钟/单IP） |
+| `RATE_LIMIT_SENSITIVE` | `5` | 敏感接口限流（update/reload） |
+| `RATE_LIMIT_DNS` | `30` | 域名解析接口限流（DNS 查询较慢，限制更严） |
+
+### CC 防护配置
+
+| 变量 | 默认值 | 说明 |
+|------|--------|------|
+| `CC_MAX_CONCURRENT` | `20` | 单 IP 最大并发连接数，超限自动封禁 |
+| `CC_BURST_WINDOW` | `2000` | 突发检测窗口（毫秒） |
+| `CC_BURST_MAX` | `40` | 窗口内最大新建连接数 |
+| `CC_SLOW_TIMEOUT` | `15000` | 慢速攻击超时（毫秒），超时未完成请求视为攻击 |
+| `CC_BLOCK_DURATION` | `60000` | 自动封禁时长（毫秒），默认 60 秒 |
+| `CC_WHITELIST` | 空 | IP 白名单（逗号分隔），白名单内 IP 不受任何限制 |
+| `CC_BLACKLIST` | 空 | IP 黑名单（逗号分隔），永远拦截 |
+
+### DNS 和网络配置
+
+| 变量 | 默认值 | 说明 |
+|------|--------|------|
+| `PUBLIC_DNS` | `8.8.8.8,8.8.4.4` | 域名解析用公共 DNS 服务器（逗号分隔，依次尝试） |
+| `PUBLIC_IP_SOURCES` | `ipinfo.io,ipify.org,checkip.amazonaws.com` | 获取公网 IP 的查询源（逗号分隔，取最快响应） |
+
+### IP 库更新配置
+
+| 变量 | 默认值 | 说明 |
+|------|--------|------|
+| `GITHUB_MIRROR` | `https://gh-proxy.com/` | GitHub 镜像加速地址。境内服务器必配，境外留空直连 |
+| `DATA_DIR` | `./data` | IP 数据库和统计文件存放目录 |
+
+### HTTPS 配置
+
+| 变量 | 默认值 | 说明 |
+|------|--------|------|
+| `SSL_KEY` | 空 | SSL 私钥文件路径，设置后启用 HTTPS |
+| `SSL_CERT` | 空 | SSL 证书文件路径 |
+
+> 如使用 Nginx/Caddy 反向代理做 SSL 终端，这两个变量保持注释即可。
+
+### 示例 `.env`
+
+```bash
+# 服务端口
+PORT=6688
+
+# 国内服务器推荐配置
+GITHUB_MIRROR=https://gh-proxy.com/
+
+# 限流调大（高并发场景）
+RATE_LIMIT_MAX=300
+RATE_LIMIT_DNS=60
+
+# CC 防护调宽松
+CC_MAX_CONCURRENT=50
+CC_BLOCK_DURATION=30000
+```
 
 ## 安全防护
 
@@ -162,7 +225,7 @@ server {
 
 ## 第三方API推荐
 
-除了自建服务，也可以用以下第三方 IP 查询 API：https://ip.zeruns.top/api-recommend.html
+除了自建服务，也可以用以下第三方 IP 查询 API：[第三方API推荐](https://ip-query.zeruns.com/api-recommend.html)
 
 ## 项目结构
 
