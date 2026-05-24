@@ -11,6 +11,7 @@
   <meta name="site-url" content="https://ip-query.zeruns.com">
   <link rel="icon" type="image/png" href="/favicon.png">
   <link rel="shortcut icon" href="/favicon.ico">
+  <script src="/i18n.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
     * { margin:0; padding:0; box-sizing:border-box; }
@@ -96,40 +97,40 @@
 <body>
 <div id="header"><div class="navbar"><span class="brand">🌐 IPQuery</span></div></div>
 <div class="container">
-  <h1>📊 网站统计</h1>
-  <div class="subtitle">页面访问量 & API 调用次数</div>
+  <h1 data-i18n="stats.title">📊 网站统计</h1>
+  <div class="subtitle" data-i18n="stats.subtitle">页面访问量 & API 调用次数</div>
 
   <div class="metrics-row">
     <div class="metric-card pv">
       <div class="metric-value" id="todayPV">-</div>
-      <div class="metric-label">今日 PV</div>
+      <div class="metric-label" data-i18n="stats.todayPV">今日 PV</div>
     </div>
     <div class="metric-card api">
       <div class="metric-value" id="todayAPI">-</div>
-      <div class="metric-label">今日 API 调用</div>
+      <div class="metric-label" data-i18n="stats.todayAPI">今日 API 调用</div>
     </div>
     <div class="metric-card pv">
       <div class="metric-value" id="totalPV">-</div>
-      <div class="metric-label">总计 PV</div>
+      <div class="metric-label" data-i18n="stats.totalPV">总计 PV</div>
     </div>
     <div class="metric-card api">
       <div class="metric-value" id="totalAPI">-</div>
-      <div class="metric-label">总计 API 调用</div>
+      <div class="metric-label" data-i18n="stats.totalAPI">总计 API 调用</div>
     </div>
   </div>
 
   <div class="tab-row">
-    <button class="tab-btn active" data-range="daily">今日</button>
-    <button class="tab-btn" data-range="weekly">7 天</button>
-    <button class="tab-btn" data-range="monthly">30 天</button>
-    <button class="tab-btn" data-range="yearly">1 年</button>
+    <button class="tab-btn active" data-range="daily" data-i18n="stats.tabToday">今日</button>
+    <button class="tab-btn" data-range="weekly" data-i18n="stats.tab7Days">7 天</button>
+    <button class="tab-btn" data-range="monthly" data-i18n="stats.tab30Days">30 天</button>
+    <button class="tab-btn" data-range="yearly" data-i18n="stats.tab1Year">1 年</button>
   </div>
 
   <div class="card">
-    <div class="card-title" id="chartTitle">📅 点击上方标签查看数据</div>
-    <div class="empty" id="placeholder" style="display:block;">👆 点击「今日」「7天」「30天」「1年」加载数据</div>
-    <div class="loading" id="loading" style="display:none">加载中...</div>
-    <div class="empty" id="empty" style="display:none">暂无数据</div>
+    <div class="card-title" id="chartTitle" data-i18n="stats.clickTabHint">📅 点击上方标签查看数据</div>
+    <div class="empty" id="placeholder" style="display:block;" data-i18n="stats.clickToLoad">👆 点击「今日」「7天」「30天」「1年」加载数据</div>
+    <div class="loading" id="loading" style="display:none" data-i18n="stats.loading">加载中...</div>
+    <div class="empty" id="empty" style="display:none" data-i18n="stats.noData">暂无数据</div>
     <div class="daily-info" id="dailyInfo" style="display:none">
       <div style="text-align:center;padding:10px 0 20px;">
         <div style="font-size:16px;color:rgba(255,255,255,0.5);" id="dailyDate"></div>
@@ -151,7 +152,7 @@
   </div>
 
   <div class="card">
-    <div class="card-title">🔌 API 接口排行</div>
+    <div class="card-title" data-i18n="stats.chartAPIRank">🔌 API 接口排行</div>
     <div class="table-wrap" id="apiTable"></div>
   </div>
 

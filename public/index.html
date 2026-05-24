@@ -11,6 +11,7 @@
   <meta name="site-url" content="https://ip-query.zeruns.com">
   <link rel="icon" type="image/png" href="/favicon.png">
   <link rel="shortcut icon" href="/favicon.ico">
+  <script src="/i18n.js"></script>
   <style>
     * { margin:0; padding:0; box-sizing:border-box; }
     body {
@@ -173,18 +174,18 @@
 <div id="header"><div class="navbar"><span class="brand">🌐 IPQuery</span></div></div>
 <div class="container">
   <div class="main-card">
-    <h1>🌐 纯真IP库查询·IP地理位置查询·本机IP查询</h1>
-    <div class="subtitle">支持 IPv4 / IPv6 / 域名解析 · 数据来源: 纯真(CZ88.NET)</div>
+    <h1 data-i18n="home.title">🌐 纯真IP库查询·IP地理位置查询·本机IP查询</h1>
+    <div class="subtitle" data-i18n="home.subtitle">支持 IPv4 / IPv6 / 域名解析 · 数据来源: 纯真(CZ88.NET)</div>
 
     <div class="search-box">
-      <input type="text" id="searchInput" placeholder="输入IP地址或域名，如 114.114.114.114" autofocus>
-      <button id="searchBtn" onclick="search()">🔍 查询</button>
+      <input type="text" id="searchInput" data-i18n-placeholder="home.searchPlaceholder" placeholder="输入IP地址或域名，如 114.114.114.114" autofocus>
+      <button id="searchBtn" onclick="search()" data-i18n="home.searchBtn">🔍 查询</button>
     </div>
     <div class="btn-row">
-      <button class="btn-secondary" onclick="queryMyIP()">📍 查询我的IP</button>
+      <button class="btn-secondary" onclick="queryMyIP()" data-i18n="home.queryMyIP">📍 查询我的IP</button>
     </div>
     <div class="examples">
-      快速查询:
+      <span data-i18n="home.quickSearch">快速查询:</span>
       <a onclick="searchBy('114.114.114.114')">114.114.114.114</a>
       <a onclick="searchBy('8.8.8.8')">8.8.8.8</a>
       <a onclick="searchBy('202.97.43.78')">202.97.43.78</a>
@@ -194,7 +195,7 @@
 
     <div class="loading" id="loading">
       <div class="spinner"></div>
-      <div class="loading-text">正在查询...</div>
+      <div class="loading-text" data-i18n="home.loading">正在查询...</div>
     </div>
     <div class="error-card" id="errorCard"></div>
 
@@ -214,19 +215,19 @@
 
       <!-- 主详情网格 -->
       <div class="result-grid" id="mainResultGrid">
-        <div class="result-item"><div class="result-label">🌍 国家</div><div class="result-value" id="rCountry">-</div></div>
-        <div class="result-item"><div class="result-label">📍 省份</div><div class="result-value" id="rRegion">-</div></div>
-        <div class="result-item"><div class="result-label">🏙️ 城市</div><div class="result-value" id="rCity">-</div></div>
-        <div class="result-item"><div class="result-label">🏘️ 区县</div><div class="result-value" id="rDistrict">-</div></div>
-        <div class="result-item full"><div class="result-label">🏢 运营商</div><div class="result-value" id="rISP">-</div></div>
-        <div class="result-item full"><div class="result-label">🔧 所有者</div><div class="result-value" id="rOwner">-</div></div>
-        <div class="result-item"><div class="result-label">📋 类型</div><div class="result-value" id="rType">-</div></div>
-        <div class="result-item"><div class="result-label">🔢 子网掩码</div><div class="result-value" id="rBitmask">-</div></div>
+        <div class="result-item"><div class="result-label" data-i18n="home.resultCountry">🌍 国家</div><div class="result-value" id="rCountry">-</div></div>
+        <div class="result-item"><div class="result-label" data-i18n="home.resultRegion">📍 省份</div><div class="result-value" id="rRegion">-</div></div>
+        <div class="result-item"><div class="result-label" data-i18n="home.resultCity">🏙️ 城市</div><div class="result-value" id="rCity">-</div></div>
+        <div class="result-item"><div class="result-label" data-i18n="home.resultDistrict">🏘️ 区县</div><div class="result-value" id="rDistrict">-</div></div>
+        <div class="result-item full"><div class="result-label" data-i18n="home.resultISP">🏢 运营商</div><div class="result-value" id="rISP">-</div></div>
+        <div class="result-item full"><div class="result-label" data-i18n="home.resultOwner">🔧 所有者</div><div class="result-value" id="rOwner">-</div></div>
+        <div class="result-item"><div class="result-label" data-i18n="home.resultType">📋 类型</div><div class="result-value" id="rType">-</div></div>
+        <div class="result-item"><div class="result-label" data-i18n="home.resultBitmask">🔢 子网掩码</div><div class="result-value" id="rBitmask">-</div></div>
       </div>
 
       <!-- 多 IP 列表（其他IP） -->
       <div class="multi-ip-section" id="multiIpSection" style="display:none">
-        <div class="multi-ip-title">📡 其他解析地址 <span style="font-weight:400;color:rgba(255,255,255,0.2);font-size:11px;text-transform:none;letter-spacing:0;">（点击展开详情）</span></div>
+        <div class="multi-ip-title"><span data-i18n="home.otherIPs">📡 其他解析地址</span> <span style="font-weight:400;color:rgba(255,255,255,0.2);font-size:11px;text-transform:none;letter-spacing:0;" data-i18n="home.clickExpand">（点击展开详情）</span></div>
         <div id="multiIpList"></div>
       </div>
     </div>
@@ -264,6 +265,7 @@ searchInput.addEventListener('keypress', e => { if (e.key === 'Enter') search();
 
 function searchBy(text) { searchInput.value = text; search(); }
 function qs(id) { return document.getElementById(id); }
+function __t(key) { return (window.I18N && window.I18N.t ? window.I18N.t(key) : null) || key; }
 
 function showLoading() {
   qs('loading').classList.add('show');
@@ -286,8 +288,8 @@ async function queryMyIP() {
     const r = await fetch('/api/myip');
     const d = await r.json();
     if (d.success && d.ip) { searchInput.value = d.ip; await search(); }
-    else { showError('无法获取本机 IP'); }
-  } catch (e) { showError('获取本机 IP 失败: ' + e.message); }
+    else { showError(__t('home.getIPFailed')); }
+  } catch (e) { showError(__t('home.getIPFailed') + ': ' + e.message); }
 }
 
 // 简单 LRU 缓存 — 避免重复查询同 IP
@@ -317,8 +319,8 @@ async function search() {
       resultCache.set(q, data);
       displayResult(data); 
     }
-    else { showError(data.error || '查询失败'); }
-  } catch (e) { showError('网络错误: ' + e.message); }
+    else { showError(data.error || __t('home.noResult')); }
+  } catch (e) { showError(__t('home.networkError') + ': ' + e.message); }
 }
 
 // classifyFields 结果缓存 — 每个 (region,isp,owner,country) 元组只算一次
@@ -335,7 +337,7 @@ function displayResult(data) {
   // 清空分类缓存（每次查询刷新）
   classifyCache.clear();
   qs('resultIp').textContent = data.ip;
-  qs('resultInput').textContent = '查询: ' + (data.input || '');
+  qs('resultInput').textContent = __t('home.queryLabel') + ': ' + (data.input || '');
 
   const badge = qs('resultBadge');
   if (data.type === 'IPv4 + IPv6') { badge.textContent = 'IPv4 + IPv6'; badge.className = 'badge badge-dual'; }
@@ -422,12 +424,12 @@ function displayResult(data) {
         detail.className = 'ip-entry-detail';
         detail.id = 'detail-' + realIdx;
         detail.innerHTML =
-          '<div class="detail-item"><div class="detail-label">国家</div><div class="detail-value">' + escHtml((item.country || '').split(/[–-]/)[0] || item.country || '-') + '</div></div>' +
-          '<div class="detail-item"><div class="detail-label">省份</div><div class="detail-value">' + escHtml(classified.province || '-') + '</div></div>' +
-          '<div class="detail-item"><div class="detail-label">城市</div><div class="detail-value">' + escHtml(classified.countryCity || item.city || '-') + '</div></div>' +
-          '<div class="detail-item"><div class="detail-label">区县</div><div class="detail-value">' + escHtml(item.district || '-') + '</div></div>' +
-          '<div class="detail-item full"><div class="detail-label">运营商</div><div class="detail-value">' + escHtml(classified.ispClean || '-') + '</div></div>' +
-          '<div class="detail-item"><div class="detail-label">类型</div><div class="detail-value">' + item.type + '</div></div>';
+          '<div class="detail-item"><div class="detail-label">' + __t('home.resultCountry') + '</div><div class="detail-value">' + escHtml((item.country || '').split(/[–-]/)[0] || item.country || '-') + '</div></div>' +
+          '<div class="detail-item"><div class="detail-label">' + __t('home.resultRegion') + '</div><div class="detail-value">' + escHtml(classified.province || '-') + '</div></div>' +
+          '<div class="detail-item"><div class="detail-label">' + __t('home.resultCity') + '</div><div class="detail-value">' + escHtml(classified.countryCity || item.city || '-') + '</div></div>' +
+          '<div class="detail-item"><div class="detail-label">' + __t('home.resultDistrict') + '</div><div class="detail-value">' + escHtml(item.district || '-') + '</div></div>' +
+          '<div class="detail-item full"><div class="detail-label">' + __t('home.resultISP') + '</div><div class="detail-value">' + escHtml(classified.ispClean || '-') + '</div></div>' +
+          '<div class="detail-item"><div class="detail-label">' + __t('home.resultType') + '</div><div class="detail-value">' + item.type + '</div></div>';
         fragment.appendChild(detail);
       });
       listEl.innerHTML = '';

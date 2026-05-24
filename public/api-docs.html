@@ -11,6 +11,7 @@
   <meta name="site-url" content="https://ip-query.zeruns.com">
   <link rel="icon" type="image/png" href="/favicon.png">
   <link rel="shortcut icon" href="/favicon.ico">
+  <script src="/i18n.js"></script>
   <style>
     * { margin:0; padding:0; box-sizing:border-box; }
     body {
@@ -134,8 +135,8 @@
 <body>
 <div id="header"><div class="navbar"><span class="brand">🌐 IPQuery</span></div></div>
 <div class="container">
-  <h1>📖 API 接口文档</h1>
-  <div class="subtitle">纯真IP库查询服务 · 全部接口支持 JSON 和 TXT 两种格式</div>
+  <h1 data-i18n="apiDocs.title">📖 API 接口文档</h1>
+  <div class="subtitle" data-i18n="apiDocs.subtitle">纯真IP库查询服务 · 全部接口支持 JSON 和 TXT 两种格式</div>
 
   <!-- 1 -->
   <div class="api-card">
@@ -143,10 +144,10 @@
     <div class="api-desc">支持 IP 地址和域名查询，自动识别类型，返回详细地理位置信息。推荐使用此接口进行所有查询。</div>
     <div class="endpoint-row"><span class="method">GET</span> <span class="path">/api/query?q=<span class="param">{ip或域名}</span></span> <span class="ftag ftag-json">JSON</span></div>
     <div class="endpoint-row"><span class="method">GET</span> <span class="path">/api/query.txt?q=<span class="param">{ip或域名}</span></span> <span class="ftag ftag-txt">TXT</span></div>
-    <div class="section-label">📎 请求示例</div>
-    <div class="example-row" data-path="/api/query?q=114.114.114.114"><span class="url">/api/query?q=114.114.114.114</span><button class="btn-test" onclick="testAPI(this)">▶ 测试</button><div class="test-result"></div></div>
-    <div class="example-row" data-path="/api/query?q=blog.zeruns.com"><span class="url">/api/query?q=blog.zeruns.com</span><button class="btn-test" onclick="testAPI(this)">▶ 测试</button><div class="test-result"></div></div>
-    <div class="example-row" data-path="/api/query.txt?q=114.114.114.114"><span class="url">/api/query.txt?q=114.114.114.114</span><button class="btn-test" onclick="testAPI(this)">▶ 测试</button><div class="test-result"></div></div>
+    <div class="section-label" data-i18n="apiDocs.sectionRequest">📎 请求示例</div>
+    <div class="example-row" data-path="/api/query?q=114.114.114.114"><span class="url">/api/query?q=114.114.114.114</span><button class="btn-test" onclick="testAPI(this)" data-i18n="apiDocs.btnTest">▶ 测试</button><div class="test-result"></div></div>
+    <div class="example-row" data-path="/api/query?q=blog.zeruns.com"><span class="url">/api/query?q=blog.zeruns.com</span><button class="btn-test" onclick="testAPI(this)" data-i18n="apiDocs.btnTest">▶ 测试</button><div class="test-result"></div></div>
+    <div class="example-row" data-path="/api/query.txt?q=114.114.114.114"><span class="url">/api/query.txt?q=114.114.114.114</span><button class="btn-test" onclick="testAPI(this)" data-i18n="apiDocs.btnTest">▶ 测试</button><div class="test-result"></div></div>
   </div>
 
   <!-- 2 -->
@@ -155,9 +156,9 @@
     <div class="api-desc">返回当前请求来源的公网 IP 地址，无需任何参数。</div>
     <div class="endpoint-row"><span class="method">GET</span> <span class="path">/api/myip</span> <span class="ftag ftag-json">JSON</span></div>
     <div class="endpoint-row"><span class="method">GET</span> <span class="path">/api/myip.txt</span> <span class="ftag ftag-txt">TXT</span></div>
-    <div class="section-label">📎 请求示例</div>
-    <div class="example-row" data-path="/api/myip"><span class="url">/api/myip</span><button class="btn-test" onclick="testAPI(this)">▶ 测试</button><div class="test-result"></div></div>
-    <div class="example-row" data-path="/api/myip.txt"><span class="url">/api/myip.txt</span><button class="btn-test" onclick="testAPI(this)">▶ 测试</button><div class="test-result"></div></div>
+    <div class="section-label" data-i18n="apiDocs.sectionRequest">📎 请求示例</div>
+    <div class="example-row" data-path="/api/myip"><span class="url">/api/myip</span><button class="btn-test" onclick="testAPI(this)" data-i18n="apiDocs.btnTest">▶ 测试</button><div class="test-result"></div></div>
+    <div class="example-row" data-path="/api/myip.txt"><span class="url">/api/myip.txt</span><button class="btn-test" onclick="testAPI(this)" data-i18n="apiDocs.btnTest">▶ 测试</button><div class="test-result"></div></div>
   </div>
 
   <!-- 3 -->
@@ -166,9 +167,9 @@
     <div class="api-desc">根据指定的 IP 地址查询其地理位置信息。仅支持 IP，不支持域名。</div>
     <div class="endpoint-row"><span class="method">GET</span> <span class="path">/api/location?q=<span class="param">{ip}</span></span> <span class="ftag ftag-json">JSON</span></div>
     <div class="endpoint-row"><span class="method">GET</span> <span class="path">/api/location.txt?q=<span class="param">{ip}</span></span> <span class="ftag ftag-txt">TXT</span></div>
-    <div class="section-label">📎 请求示例</div>
-    <div class="example-row" data-path="/api/location?q=8.8.8.8"><span class="url">/api/location?q=8.8.8.8</span><button class="btn-test" onclick="testAPI(this)">▶ 测试</button><div class="test-result"></div></div>
-    <div class="example-row" data-path="/api/location.txt?q=8.8.8.8"><span class="url">/api/location.txt?q=8.8.8.8</span><button class="btn-test" onclick="testAPI(this)">▶ 测试</button><div class="test-result"></div></div>
+    <div class="section-label" data-i18n="apiDocs.sectionRequest">📎 请求示例</div>
+    <div class="example-row" data-path="/api/location?q=8.8.8.8"><span class="url">/api/location?q=8.8.8.8</span><button class="btn-test" onclick="testAPI(this)" data-i18n="apiDocs.btnTest">▶ 测试</button><div class="test-result"></div></div>
+    <div class="example-row" data-path="/api/location.txt?q=8.8.8.8"><span class="url">/api/location.txt?q=8.8.8.8</span><button class="btn-test" onclick="testAPI(this)" data-i18n="apiDocs.btnTest">▶ 测试</button><div class="test-result"></div></div>
   </div>
 
   <!-- 4 -->
@@ -177,9 +178,9 @@
     <div class="api-desc">返回服务端看到的请求来源 IP 及其地理位置。通过 Tailscale/代理访问时，显示的是隧道入口 IP（如 <code>100.x.x.x</code>），非客户端真实公网 IP。</div>
     <div class="endpoint-row"><span class="method">GET</span> <span class="path">/api/mylocation</span> <span class="ftag ftag-json">JSON</span></div>
     <div class="endpoint-row"><span class="method">GET</span> <span class="path">/api/mylocation.txt</span> <span class="ftag ftag-txt">TXT</span></div>
-    <div class="section-label">📎 请求示例</div>
-    <div class="example-row" data-path="/api/mylocation"><span class="url">/api/mylocation</span><button class="btn-test" onclick="testAPI(this)">▶ 测试</button><div class="test-result"></div></div>
-    <div class="example-row" data-path="/api/mylocation.txt"><span class="url">/api/mylocation.txt</span><button class="btn-test" onclick="testAPI(this)">▶ 测试</button><div class="test-result"></div></div>
+    <div class="section-label" data-i18n="apiDocs.sectionRequest">📎 请求示例</div>
+    <div class="example-row" data-path="/api/mylocation"><span class="url">/api/mylocation</span><button class="btn-test" onclick="testAPI(this)" data-i18n="apiDocs.btnTest">▶ 测试</button><div class="test-result"></div></div>
+    <div class="example-row" data-path="/api/mylocation.txt"><span class="url">/api/mylocation.txt</span><button class="btn-test" onclick="testAPI(this)" data-i18n="apiDocs.btnTest">▶ 测试</button><div class="test-result"></div></div>
   </div>
 
   <!-- 5 -->
@@ -188,9 +189,9 @@
     <div class="api-desc">解析指定域名的所有 IPv4 地址（A 记录），JSON 格式返回数量和 IP 列表。</div>
     <div class="endpoint-row"><span class="method">GET</span> <span class="path">/api/resolve4?q=<span class="param">{域名}</span></span> <span class="ftag ftag-json">JSON</span></div>
     <div class="endpoint-row"><span class="method">GET</span> <span class="path">/api/resolve4.txt?q=<span class="param">{域名}</span></span> <span class="ftag ftag-txt">TXT</span></div>
-    <div class="section-label">📎 请求示例</div>
-    <div class="example-row" data-path="/api/resolve4?q=blog.zeruns.com"><span class="url">/api/resolve4?q=blog.zeruns.com</span><button class="btn-test" onclick="testAPI(this)">▶ 测试</button><div class="test-result"></div></div>
-    <div class="example-row" data-path="/api/resolve4.txt?q=blog.zeruns.com"><span class="url">/api/resolve4.txt?q=blog.zeruns.com</span><button class="btn-test" onclick="testAPI(this)">▶ 测试</button><div class="test-result"></div></div>
+    <div class="section-label" data-i18n="apiDocs.sectionRequest">📎 请求示例</div>
+    <div class="example-row" data-path="/api/resolve4?q=blog.zeruns.com"><span class="url">/api/resolve4?q=blog.zeruns.com</span><button class="btn-test" onclick="testAPI(this)" data-i18n="apiDocs.btnTest">▶ 测试</button><div class="test-result"></div></div>
+    <div class="example-row" data-path="/api/resolve4.txt?q=blog.zeruns.com"><span class="url">/api/resolve4.txt?q=blog.zeruns.com</span><button class="btn-test" onclick="testAPI(this)" data-i18n="apiDocs.btnTest">▶ 测试</button><div class="test-result"></div></div>
   </div>
 
   <!-- 6 -->
@@ -199,9 +200,9 @@
     <div class="api-desc">解析指定域名的所有 IPv6 地址（AAAA 记录），JSON 格式返回数量和 IP 列表。</div>
     <div class="endpoint-row"><span class="method">GET</span> <span class="path">/api/resolve6?q=<span class="param">{域名}</span></span> <span class="ftag ftag-json">JSON</span></div>
     <div class="endpoint-row"><span class="method">GET</span> <span class="path">/api/resolve6.txt?q=<span class="param">{域名}</span></span> <span class="ftag ftag-txt">TXT</span></div>
-    <div class="section-label">📎 请求示例</div>
-    <div class="example-row" data-path="/api/resolve6?q=blog.zeruns.com"><span class="url">/api/resolve6?q=blog.zeruns.com</span><button class="btn-test" onclick="testAPI(this)">▶ 测试</button><div class="test-result"></div></div>
-    <div class="example-row" data-path="/api/resolve6.txt?q=blog.zeruns.com"><span class="url">/api/resolve6.txt?q=blog.zeruns.com</span><button class="btn-test" onclick="testAPI(this)">▶ 测试</button><div class="test-result"></div></div>
+    <div class="section-label" data-i18n="apiDocs.sectionRequest">📎 请求示例</div>
+    <div class="example-row" data-path="/api/resolve6?q=blog.zeruns.com"><span class="url">/api/resolve6?q=blog.zeruns.com</span><button class="btn-test" onclick="testAPI(this)" data-i18n="apiDocs.btnTest">▶ 测试</button><div class="test-result"></div></div>
+    <div class="example-row" data-path="/api/resolve6.txt?q=blog.zeruns.com"><span class="url">/api/resolve6.txt?q=blog.zeruns.com</span><button class="btn-test" onclick="testAPI(this)" data-i18n="apiDocs.btnTest">▶ 测试</button><div class="test-result"></div></div>
   </div>
 
   <!-- 7 -->
@@ -209,8 +210,8 @@
     <div class="api-card-header"><div class="api-card-number">7</div><div class="api-card-title">获取 IP 库信息</div></div>
     <div class="api-desc">返回当前使用的纯真 IP 库的版本号和描述信息。</div>
     <div class="endpoint-row"><span class="method">GET</span> <span class="path">/api/info</span> <span class="ftag ftag-json">JSON</span></div>
-    <div class="section-label">📎 请求示例</div>
-    <div class="example-row" data-path="/api/info"><span class="url">/api/info</span><button class="btn-test" onclick="testAPI(this)">▶ 测试</button><div class="test-result"></div></div>
+    <div class="section-label" data-i18n="apiDocs.sectionRequest">📎 请求示例</div>
+    <div class="example-row" data-path="/api/info"><span class="url">/api/info</span><button class="btn-test" onclick="testAPI(this)" data-i18n="apiDocs.btnTest">▶ 测试</button><div class="test-result"></div></div>
   </div>
 
   <!-- 8 -->
@@ -218,14 +219,16 @@
     <div class="api-card-header"><div class="api-card-number">8</div><div class="api-card-title">IP 库状态</div></div>
     <div class="api-desc">返回当前 IP 数据库的运行状态、版本和文件信息。</div>
     <div class="endpoint-row"><span class="method">GET</span> <span class="path">/api/status</span> <span class="ftag ftag-json">JSON</span></div>
-    <div class="section-label">📎 请求示例</div>
-    <div class="example-row" data-path="/api/status"><span class="url">/api/status</span><button class="btn-test" onclick="testAPI(this)">▶ 测试</button><div class="test-result"></div></div>
+    <div class="section-label" data-i18n="apiDocs.sectionRequest">📎 请求示例</div>
+    <div class="example-row" data-path="/api/status"><span class="url">/api/status</span><button class="btn-test" onclick="testAPI(this)" data-i18n="apiDocs.btnTest">▶ 测试</button><div class="test-result"></div></div>
   </div>
 
   <div id="footer"></div>
 </div>
 
 <script>
+function __t(key) { return (window.I18N && window.I18N.t ? window.I18N.t(key) : null) || key; }
+
 function testAPI(btn) {
   const row = btn.closest('.example-row');
   const path = row.getAttribute('data-path');
@@ -234,7 +237,7 @@ function testAPI(btn) {
   const fullUrl = base + path;
 
   // 切换加载状态
-  btn.textContent = '⏳';
+  btn.textContent = __t('apiDocs.btnTesting');
   btn.className = 'btn-test loading';
   resultEl.className = 'test-result';
   resultEl.innerHTML = '';
@@ -280,7 +283,7 @@ function testAPI(btn) {
     .catch(err => {
       resultEl.innerHTML =
         '<div class="test-status">' +
-          '<span class="http-badge err">❌ 错误</span>' +
+          '<span class="http-badge err">' + __t('apiRecommend.fail') + '</span>' +
           '<span>' + escHtml(err.message) + '</span>' +
         '</div>';
       resultEl.className = 'test-result show error';
