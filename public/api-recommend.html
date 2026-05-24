@@ -6,6 +6,9 @@
   <title>IP查询API推荐 - 多源IP信息对比 | IP归属地查询</title>
   <meta name="description" content="国内外主流IP查询API服务推荐列表，包含ipinfo.io、ip-api.com、ip.sb等，支持IPv4/IPv6地理位置查询，供开发者对比选择。">
   <meta name="keywords" content="IP查询API推荐,ipinfo,ip-api,ip.sb,IP地理位置API,免费IP查询">
+  <meta name="seo-title" content="IP查询API推荐 - 多源IP信息对比 | IP归属地查询">
+  <meta name="seo-description" content="国内外主流IP查询API服务推荐列表，包含ipinfo.io、ip-api.com、ip.sb等，支持IPv4/IPv6地理位置查询，供开发者对比选择。">
+  <meta name="seo-keywords" content="IP查询API推荐,ipinfo,ip-api,ip.sb,IP地理位置API,免费IP查询">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="">
   <meta name="site-url" content="https://ip-query.zeruns.com">
@@ -470,6 +473,12 @@ initGrid();
   var siteUrl = document.querySelector('meta[name="site-url"]')?.content || location.origin;
   var canonical = document.querySelector('link[rel="canonical"]');
   if (canonical) canonical.href = siteUrl + location.pathname;
+  var st = document.querySelector('meta[name="seo-title"]')?.content;
+  if (st) document.title = st;
+  var sd = document.querySelector('meta[name="seo-description"]')?.content;
+  if (sd) { var m = document.querySelector('meta[name="description"]'); if(m) m.content = sd; }
+  var sk = document.querySelector('meta[name="seo-keywords"]')?.content;
+  if (sk) { var m = document.querySelector('meta[name="keywords"]'); if(m) m.content = sk; }
 
   var path = location.pathname;
   var activeNav = 'home';

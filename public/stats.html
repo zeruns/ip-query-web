@@ -4,6 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>网站统计 - IP归属地查询</title>
+  <meta name="description" content="IP归属地查询系统网站统计页，查看页面访问量和API调用次数。">
+  <meta name="keywords" content="网站统计,PV,API调用统计">
+  <meta name="seo-title" content="网站统计 - IP归属地查询">
+  <meta name="seo-description" content="IP归属地查询系统网站统计页，查看页面访问量和API调用次数。">
+  <meta name="seo-keywords" content="网站统计,PV,API调用统计">
   <meta name="robots" content="noindex, nofollow">
   <meta name="site-url" content="https://ip-query.zeruns.com">
   <link rel="canonical" href="">
@@ -163,6 +168,12 @@
   var siteUrl = document.querySelector('meta[name="site-url"]')?.content || location.origin;
   var canonical = document.querySelector('link[rel="canonical"]');
   if (canonical) canonical.href = siteUrl + location.pathname;
+  var st = document.querySelector('meta[name="seo-title"]')?.content;
+  if (st) document.title = st;
+  var sd = document.querySelector('meta[name="seo-description"]')?.content;
+  if (sd) { var m = document.querySelector('meta[name="description"]'); if(m) m.content = sd; }
+  var sk = document.querySelector('meta[name="seo-keywords"]')?.content;
+  if (sk) { var m = document.querySelector('meta[name="keywords"]'); if(m) m.content = sk; }
 
   var path = location.pathname;
   var activeNav = 'home';
