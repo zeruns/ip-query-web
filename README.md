@@ -2,7 +2,7 @@
 
 <p align="center">
   <strong>基于纯真IP库的精确地理定位服务</strong><br>
-  支持 IPv4 / IPv6 / 域名解析 · 双格式 API（JSON + TXT）· 自带暗色 Web 界面
+  支持 IPv4 / IPv6 / 域名解析 · 双格式 API（JSON + TXT）· 自带暗色 Web 界面 · 中英文双语切换
 </p>
 
 <p align="center">
@@ -21,20 +21,22 @@
 
 - **查询 IP 归属地** — 输入任意 IPv4/IPv6 地址，获取国家、省份、城市、区县、运营商等信息
 - **域名解析** — 自动解析域名的 A/AAAA 记录并查询每个 IP 的地理位置
-- **获取本机 IP** — 通过 `/api/myip` 或 `/api/mylocation` 获取访问者真实的来源 IP
-- **批量查询** — 单次最多查询 50 个 IP 地址
+- **获取客户端 IP** — 通过 `/api/myip` 或 `/api/mylocation` 获取访问者真实的来源 IP
+- **批量查询** — 通过 POST `/api/batch` 单次最多查询 50 个 IP 地址
 - **API 服务** — 提供 RESTful API，支持 JSON 和纯文本双格式，方便集成到各类应用中
-- **网站统计** — 内置 PV 和 API 调用统计面板，支持图表展示
-- **自动更新** — 每周一凌晨自动从纯真 IP 库 GitHub 仓库拉取最新数据
+- **网站统计** — 内置 PV 和 API 调用统计面板，基于 Chart.js 图表展示日/周/月/年数据
+- **自动更新** — 每周一凌晨 3:00 自动从纯真 IP 库 GitHub 仓库拉取最新数据
+- **中英文双语** — 支持中文 / English 界面切换，自动检测浏览器语言
+- **命令行工具** — `node cli.js <IP/域名>` 直接查询
 
 ### 适用场景
 
-- 获取网站访客来源信息（配合 Nginx 反代可识别真实 IP）
+- 获取网站访客来源信息（配合 Nginx 反代可识别真实 IP，支持 Cloudflare / 阿里云 CDN 等）
 - 为其他应用提供 IP 地理位置查询 API
 - 用作自定义查询工具或集成到自动化脚本中
 - 学习 Node.js/Express Web 开发与项目架构
 
-## 在线演示
+## 安装部署
 
 ### 方式一：裸机安装（推荐）
 
@@ -63,7 +65,7 @@ docker compose up -d --build
 |------|------|
 | `http://localhost:6688` | 主查询界面 |
 | `http://localhost:6688/api-docs.html` | API 文档（在线测试） |
-| `http://localhost:6688/stats.html` | 网站统计 |
+| `http://localhost:6688/stats.html` | 网站统计（Chart.js 图表） |
 
 ## 在线演示
 
@@ -75,8 +77,10 @@ docker compose up -d --build
 - **域名解析** — 自动解析 A / AAAA 记录并查询每个 IP
 - **双格式 API** — JSON 和纯文本（`.txt`）输出，适应不同场景
 - **暗色 Web 界面** — 自带查询页面、API 文档、统计面板
+- **中英文双语** — 支持中文和 English 界面切换，自动检测浏览器语言偏好
 - **命令行工具** — `node cli.js <IP/域名>` 直接查询
-- **IP 库自动更新** — 每周一凌晨自动拉取最新纯真 IP 库（支持 GitHub 镜像加速）
+- **IP 库自动更新** — 每周一凌晨 3:00 自动拉取最新纯真 IP 库（支持 GitHub 镜像加速）
+- **网站统计** — PV 和 API 调用统计，基于 Chart.js 图表展示
 - **三层安全防护** — CC 防护 + 分级限流 + 安全头
 
 ## API 接口
@@ -85,26 +89,29 @@ docker compose up -d --build
 
 | 接口 | 说明 | 限流（次/分钟） |
 |------|------|:---:|
-| `GET /api/query?q=<IP或域名>` | 综合查询（推荐） | 30 |
-| `GET /api/myip` | 获取访问者 IP 地址 | 120 |
-| `GET /api/location?q=<IP>` | IP 查地理位置 | 120 |
-| `GET /api/mylocation` | 获取访问者地理位置 | 120 |
-| `GET /api/resolve4?q=<域名>` | 域名解析 IPv4 | 30 |
-| `GET /api/resolve6?q=<域名>` | 域名解析 IPv6 | 30 |
+| `GET /api/query?q=<IP或域名>` | 综合查询（推荐，支持IP和域名） | 30 |
+| `GET /api/myip` | 获取客户端 IP 地址（通过请求头识别） | 120 |
+| `GET /api/location?q=<IP>` | IP 查地理位置（仅支持 IP） | 120 |
+| `GET /api/mylocation` | 获取访问者来源 IP 及地理位置 | 120 |
+| `GET /api/resolve4?q=<域名>` | 域名解析 IPv4 地址 | 30 |
+| `GET /api/resolve6?q=<域名>` | 域名解析 IPv6 地址 | 30 |
 | `GET /api/info` | 数据库版本信息 | 120 |
-| `GET /api/status` | 数据库状态 | 120 |
-| `GET /api/stats?range=daily\|weekly\|monthly\|yearly` | 网站统计 | 120 |
+| `GET /api/status` | 数据库状态（含可用性检查） | 120 |
+| `GET /api/stats?range=daily\|weekly\|monthly\|yearly` | 网站统计数据 | 120 |
 | `POST /api/batch` | 批量 IP 查询（≤50） | 120 |
-| `GET /health` | 健康检查 | ∞ |
+| `GET /health` | 健康检查（无限制） | ∞ |
 
 ### 调用示例
 
 ```bash
-# JSON 格式
+# JSON 格式 — 综合查询（支持 IP 和域名）
 curl http://localhost:6688/api/query?q=8.8.8.8
 
 # 纯文本格式
 curl http://localhost:6688/api/query.txt?q=8.8.8.8
+
+# 获取客户端 IP
+curl http://localhost:6688/api/myip
 
 # 批量查询
 curl -X POST http://localhost:6688/api/batch \
@@ -142,7 +149,7 @@ vim .env               # 按需修改
 | 变量 | 默认值 | 说明 |
 |------|--------|------|
 | `RATE_LIMIT_MAX` | `120` | 普通 API 查询限流（次/分钟/单IP） |
-| `RATE_LIMIT_DNS` | `30` | 域名解析接口限流（DNS 查询较慢，限制更严） |
+| `RATE_LIMIT_DNS` | `30` | 域名查询接口限流（涉及 DNS 解析，限制更严） |
 
 ### CC 防护配置
 
@@ -161,7 +168,7 @@ vim .env               # 按需修改
 | 变量 | 默认值 | 说明 |
 |------|--------|------|
 | `PUBLIC_DNS` | `8.8.8.8,8.8.4.4` | 域名解析用公共 DNS 服务器（逗号分隔，依次尝试） |
-| `PUBLIC_IP_SOURCES` | `ipinfo.io,ipify.org,checkip.amazonaws.com` | 获取公网 IP 的查询源（逗号分隔，取最快响应） |
+| `PUBLIC_IP_SOURCES` | `https://ipinfo.io/ip,https://api.ipify.org,https://checkip.amazonaws.com` | 获取公网 IP 的查询源（逗号分隔，取最快响应） |
 
 ### IP 库更新配置
 
@@ -178,6 +185,16 @@ vim .env               # 按需修改
 | `SSL_CERT` | 空 | SSL 证书文件路径 |
 
 > 如使用 Nginx/Caddy 反向代理做 SSL 终端，这两个变量保持注释即可。
+
+### 网站信息配置（静态文件）
+
+> 以下配置项通过修改 HTML 静态文件完成，详见各文件内的标签：
+
+| 配置项 | 修改位置 | 说明 |
+|------|--------|------|
+| 网站域名 | 各 HTML 页面 `<meta name="site-url">` | 用于 SEO 的 canonical URL |
+| ICP 备案号 | `public/components/footer.html` | 底部备案号链接 |
+| SEO 标题/描述/关键词 | 各 HTML 页面 `<title>`、`<meta name="description">`、`<meta name="keywords">` | 搜索引擎优化 |
 
 ### 示例 `.env`
 
@@ -204,8 +221,8 @@ CC_BLOCK_DURATION=30000
 | 层级 | 实现 | 功能 |
 |:---:|------|------|
 | 1 | CC 防护（纯 Node） | 并发限制 + 突发检测 + 慢速攻击防御 + 自动封禁 + IP 黑白名单 |
-| 2 | express-rate-limit | 按接口类型分级限流（普通 / DNS） |
-| 3 | 安全头 | `X-Frame-Options`, `XSS-Protection`, `CORS` 控制 |
+| 2 | express-rate-limit | 按接口类型分级限流（普通 / DNS 解析） |
+| 3 | 安全头 | `X-Frame-Options`、`X-XSS-Protection`、`X-Content-Type-Options`、`Referrer-Policy`、`CORS` 控制 |
 
 ## Nginx 反向代理
 
@@ -233,12 +250,15 @@ server {
 
 ### CDN 兼容
 
-| CDN | 请求头 | 自动识别 |
-|-----|-------|:---:|
+系统通过 `getClientIP()` 函数智能识别客户端真实 IP，优先级从高到低：
+
+| CDN / 代理 | 请求头 | 自动识别 |
+|-----------|-------|:---:|
 | Cloudflare | `CF-Connecting-IP` | ✅ |
+| Cloudflare / 阿里云 / Google Cloud | `True-Client-IP` | ✅ |
 | 阿里云 CDN | `Ali-CDN-Real-IP` | ✅ |
-| Google Cloud | `True-Client-IP` | ✅ |
-| Nginx 反代 | `X-Real-IP` / `X-Forwarded-For` | ✅ |
+| Nginx 反代 | `X-Real-IP` | ✅ |
+| 通用 | `X-Forwarded-For`（取第一个） | ✅ |
 
 ## 第三方API推荐
 
@@ -249,6 +269,9 @@ server {
 ```
 ├── server.js              # Express 服务器入口
 ├── cli.js                 # 命令行查询工具
+├── package.json           # 项目配置与依赖
+├── .env.example           # 环境变量模板
+├── LICENSE                # GPL-3.0 许可证
 ├── src/
 │   ├── config.js          # 统一配置层
 │   ├── ipdb.js            # IP 库查询引擎
@@ -260,7 +283,10 @@ server {
 │   ├── index.html         # 主查询页面（暗色主题）
 │   ├── api-docs.html      # API 文档（在线测试）
 │   ├── api-recommend.html # 第三方 API 对比
-│   ├── stats.html         # 统计面板
+│   ├── stats.html         # 统计面板（Chart.js 图表）
+│   ├── i18n.js            # 中英文双语切换
+│   ├── favicon.ico        # 网站图标
+│   ├── favicon.png        # 网站图标
 │   └── components/        # 页头/页尾组件
 └── data/                  # IP 数据库 & 统计数据
 ```
@@ -274,7 +300,7 @@ server {
 
 ## 数据来源
 
-IP 地理位置数据来自 [纯真 IP 库 (CZ88.NET)](https://github.com/nmgliangwei/qqwry.ipdb)，通过 npm 包 `qqwry.ipdb` 分发，每周自动更新。
+IP 地理位置数据来自 [纯真 IP 库 (CZ88.NET)](https://github.com/nmgliangwei/qqwry.ipdb)，通过 npm 包 `qqwry.ipdb` 分发，每周一凌晨 3:00 自动更新。
 
 ## 作者
 
