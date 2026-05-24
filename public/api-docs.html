@@ -8,6 +8,7 @@
   <meta name="keywords" content="IP查询API,IP归属地API,本机IP接口,公网IP接口,域名解析API,地理位置API">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://ip.zeruns.top/api-docs.html">
+  <meta name="beian" content="粤ICP备xxxxx号">
   <link rel="icon" type="image/png" href="/favicon.png">
   <link rel="shortcut icon" href="/favicon.ico">
   <style>
@@ -310,6 +311,11 @@ function escHtml(str) { const d = document.createElement('div'); d.textContent =
     .then(function(r){ return r.text(); })
     .then(function(html){
       document.getElementById('footer').innerHTML = html;
+      var beian = document.querySelector('meta[name="beian"]')?.content;
+      if (beian) {
+        var el = document.getElementById('footer');
+        el.innerHTML += '<br><a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener" style="color:rgba(255,255,255,0.12);font-size:11px;">' + beian + '</a>';
+      }
     });
 })();
 </script>

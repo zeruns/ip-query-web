@@ -8,6 +8,7 @@
   <meta name="keywords" content="IP查询,IP归属地,本机IP,我的IP,IP地址查询,公网IP,IPv4查询,IPv6查询,域名解析,地理位置查询,纯真IP库">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://ip.zeruns.top/">
+  <meta name="beian" content="粤ICP备xxxxx号">
   <link rel="icon" type="image/png" href="/favicon.png">
   <link rel="shortcut icon" href="/favicon.ico">
   <style>
@@ -479,6 +480,11 @@ function toggleDetail(idx, entryEl) {
     .then(function(r){ return r.text(); })
     .then(function(html){
       document.getElementById('footer').innerHTML = html;
+      var beian = document.querySelector('meta[name="beian"]')?.content;
+      if (beian) {
+        var el = document.getElementById('footer');
+        el.innerHTML += '<br><a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener" style="color:rgba(255,255,255,0.12);font-size:11px;">' + beian + '</a>';
+      }
     });
 })();
 </script>
