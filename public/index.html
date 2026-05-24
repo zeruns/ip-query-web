@@ -7,7 +7,8 @@
   <meta name="description" content="在线IP归属地查询工具，支持IPv4和IPv6地址查询、域名解析、本机公网IP获取。基于纯真IP数据库，快速准确查询IP地理位置、运营商信息。">
   <meta name="keywords" content="IP查询,IP归属地,本机IP,我的IP,IP地址查询,公网IP,IPv4查询,IPv6查询,域名解析,地理位置查询,纯真IP库">
   <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://ip.zeruns.top/">
+  <link rel="canonical" href="">
+  <meta name="site-url" content="https://ip-query.zeruns.com">
   <meta name="beian" content="粤ICP备xxxxx号">
   <link rel="icon" type="image/png" href="/favicon.png">
   <link rel="shortcut icon" href="/favicon.ico">
@@ -235,26 +236,29 @@
   <div id="footer"></div>
 </div>
 
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebApplication",
-  "name": "IP归属地查询",
-  "url": "https://ip.zeruns.top/",
-  "description": "在线IP归属地查询工具，支持IPv4和IPv6地址查询、域名解析、本机公网IP获取。基于纯真IP数据库。",
-  "applicationCategory": "UtilityApplication",
-  "operatingSystem": "All",
-  "browserRequirements": "Requires JavaScript",
-  "offers": {
-    "@type": "Offer",
-    "price": "0",
-    "priceCurrency": "CNY"
-  }
-}
-</script>
+<script type="application/ld+json" id="site-ldjson"></script>
 
 <script src="/classifier.js"></script>
 <script>
+// 从 meta 标签读取网站域名，设置 canonical 和 JSON-LD
+(function(){
+  var siteUrl = document.querySelector('meta[name="site-url"]')?.content || location.origin;
+  var canonical = document.querySelector('link[rel="canonical"]');
+  if (canonical) canonical.href = siteUrl + '/';
+  var ld = document.getElementById('site-ldjson');
+  if (ld) ld.textContent = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "IP归属地查询",
+    "url": siteUrl + '/',
+    "description": "在线IP归属地查询工具，支持IPv4和IPv6地址查询、域名解析、本机公网IP获取。基于纯真IP数据库。",
+    "applicationCategory": "UtilityApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CNY" }
+  });
+})();
+
 const searchInput = document.getElementById('searchInput');
 searchInput.addEventListener('keypress', e => { if (e.key === 'Enter') search(); });
 

@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>网站统计 - IP归属地查询</title>
   <meta name="robots" content="noindex, nofollow">
+  <meta name="site-url" content="https://ip-query.zeruns.com">
+  <link rel="canonical" href="">
   <meta name="beian" content="粤ICP备xxxxx号">
   <link rel="icon" type="image/png" href="/favicon.png">
   <link rel="shortcut icon" href="/favicon.ico">
@@ -158,6 +160,10 @@
 <script>
 // ── 组件加载 ──
 (function(){
+  var siteUrl = document.querySelector('meta[name="site-url"]')?.content || location.origin;
+  var canonical = document.querySelector('link[rel="canonical"]');
+  if (canonical) canonical.href = siteUrl + location.pathname;
+
   var path = location.pathname;
   var activeNav = 'home';
   if (path.indexOf('api-docs') !== -1) activeNav = 'docs';

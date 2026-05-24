@@ -7,7 +7,8 @@
   <meta name="description" content="国内外主流IP查询API服务推荐列表，包含ipinfo.io、ip-api.com、ip.sb等，支持IPv4/IPv6地理位置查询，供开发者对比选择。">
   <meta name="keywords" content="IP查询API推荐,ipinfo,ip-api,ip.sb,IP地理位置API,免费IP查询">
   <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://ip.zeruns.top/api-recommend.html">
+  <link rel="canonical" href="">
+  <meta name="site-url" content="https://ip-query.zeruns.com">
   <meta name="beian" content="粤ICP备xxxxx号">
   <link rel="icon" type="image/png" href="/favicon.png">
   <link rel="shortcut icon" href="/favicon.ico">
@@ -466,6 +467,10 @@ initGrid();
 </script>
 <script>
 (function(){
+  var siteUrl = document.querySelector('meta[name="site-url"]')?.content || location.origin;
+  var canonical = document.querySelector('link[rel="canonical"]');
+  if (canonical) canonical.href = siteUrl + location.pathname;
+
   var path = location.pathname;
   var activeNav = 'home';
   if (path.indexOf('api-docs') !== -1) activeNav = 'docs';

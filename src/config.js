@@ -73,6 +73,9 @@ const config = {
   // ─── ICP 备案号 ───
   icpBeian: (process.env.ICP_BEIAN || '').trim(),
 
+  // ─── 网站域名 ───
+  siteURL: (process.env.SITE_URL || 'http://localhost:6688').replace(/\/+$/, ''),
+
   // ─── 应用信息 ───
   app: {
     name: 'IP 归属地查询系统',
