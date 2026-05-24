@@ -69,6 +69,9 @@ const config = {
   // ─── 日志级别 ───
   logLevel: (process.env.LOG_LEVEL || 'info').toLowerCase(),
 
+  // ─── GitHub 镜像（用于下载 IP 数据库） ───
+  githubMirror: (process.env.GITHUB_MIRROR || '').replace(/\/+$/, ''),
+
   // ─── 应用信息 ───
   app: {
     name: 'IP 归属地查询系统',
