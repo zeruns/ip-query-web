@@ -496,7 +496,18 @@ initGrid();
   fetch('/components/footer.html')
     .then(function(r){ return r.text(); })
     .then(function(html){
-      document.getElementById('footer').innerHTML = html;
+      var container = document.getElementById('footer');
+      var tmp = document.createElement('div');
+      tmp.innerHTML = html;
+      var scripts = tmp.querySelectorAll('script');
+      scripts.forEach(function(s){
+        var ns = document.createElement('script');
+        if (s.src) ns.src = s.src;
+        ns.textContent = s.textContent;
+        document.body.appendChild(ns);
+        s.remove();
+      });
+      container.innerHTML = tmp.innerHTML;
       if (window.I18N) I18N.applyAll();
     });
 })();
