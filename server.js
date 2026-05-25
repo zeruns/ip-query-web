@@ -127,6 +127,7 @@ function getClientIP(req) {
   const cdnHeaders = [
     'cf-connecting-ip',      // Cloudflare
     'true-client-ip',        // Cloudflare / 阿里云 / Google Cloud
+    'ali-real-client-ip',    // 阿里云 ESA 托管转换
     'ali-cdn-real-ip',       // 阿里云 CDN
     'x-real-ip',             // Nginx
     'x-forwarded-for',       // 通用（取第一个）

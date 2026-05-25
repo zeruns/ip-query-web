@@ -264,7 +264,8 @@ The system intelligently identifies the real client IP via `getClientIP()`, prio
 
 > **1. CDN side — Enable real IP passthrough:**
 >
-> * **Aliyun ESA**: ESA Console → Site → **Rules → Transform Rules** → Add a request header rule to pass the real client IP via `X-Forwarded-For` to the origin.
+> * **Aliyun ESA** (Method 1, recommended): ESA Console → Site → **Rules → Transform Rules → Managed Transforms** → Enable "Add real client IP header", default header name `ali-real-client-ip`.
+> * **Aliyun ESA** (Method 2): **Rules → Transform Rules** → Add a request header rule to pass the real client IP via `X-Forwarded-For`.
 > * **Cloudflare**: Enabled by default, no extra configuration needed.
 >
 > **2. Nginx side — Trust proxy IPs:**
