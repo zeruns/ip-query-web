@@ -24,9 +24,9 @@ const stats = require('./src/stats');
 // ──────────── 配置 ────────────
 const app = express();
 
-// 信任代理（Nginx 反代 / CDN 场景必须）
-// 设置为 1 信任最近一级代理，设置为 true 信任所有代理
-app.set('trust proxy', 1);
+// 信任代理 — CDN + Nginx 场景必须设为 true
+// getClientIP() 优先从 CDN 专用头获取真实 IP，安全无虞
+app.set('trust proxy', true);
 
 const PORT = config.port;
 const HOST = config.host;
