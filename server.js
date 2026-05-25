@@ -88,13 +88,14 @@ app.use((req, res, next) => {
   next();
 });
 
-// 统计分析代码注入（在 HTML 响应 </body> 前插入）
+// 统计分析代码注入（在 HTML 响应 </body> 前插入，延迟执行防止阻塞页面）
 if (config.analyticsBody) {
   const originalSend = app.response.send;
   app.response.send = function(body) {
-    if (typeof body === 'string' && this.get('Content-Type') && this.get('Content-Type').includes('text/html')) {
-      body = body.replace('</body>', config.analyticsBody + '</body>');
-      // 重新计算 Content-Length（如果已设置）
+    if (typeof body === 'string' && this.get('Content-Type') && this.get('Content-Type').includes('text/html') && !this.req.path.startsWith('/api/')) {
+      // 用 setTimeout 包裹统计代码，确保不阻塞 DOMContentLoaded
+      const wrapper = '<script>setTimeout(function(){' + config.analyticsBody + '},0);<\/script>';
+      body = body.replace('</body>', wrapper + '</body>');
       if (this.get('Content-Length')) {
         this.set('Content-Length', Buffer.byteLength(body));
       }
