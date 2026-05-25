@@ -260,6 +260,32 @@ The system intelligently identifies the real client IP via `getClientIP()`, prio
 | Nginx reverse proxy | `X-Real-IP` | ✓ |
 | Generic | `X-Forwarded-For` (first value) | ✓ |
 
+> **Two-step configuration required when using CDN:**
+
+> **1. CDN side — Enable real IP passthrough:**
+>
+> * **Aliyun ESA**: ESA Console → Site → **Rules → Transform Rules** → Add a request header rule to pass the real client IP via `X-Forwarded-For` to the origin.
+> * **Cloudflare**: Enabled by default, no extra configuration needed.
+>
+> **2. Nginx side — Trust proxy IPs:**
+>
+> ```nginx
+> server {
+>     set_real_ip_from 0.0.0.0/0;
+>     real_ip_header X-Forwarded-For;
+>     real_ip_recursive on;
+>
+>     location / {
+>         proxy_pass http://127.0.0.1:6688;
+>         proxy_set_header X-Real-IP $remote_addr;
+>         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+>         ...
+>     }
+> }
+> ```
+>
+> Change `real_ip_header` to `CF-Connecting-IP` for Cloudflare users.
+
 ## Third-Party API Recommendations
 
 In addition to self-hosted services, you can also use these third-party IP query APIs: [Third-Party API Recommendations](https://ip-query.zeruns.com/api-recommend.html)
