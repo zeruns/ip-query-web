@@ -88,6 +88,21 @@ app.use((req, res, next) => {
   next();
 });
 
+// 统计分析代码注入（在 HTML 响应 </body> 前插入）
+if (config.analyticsBody) {
+  const originalSend = app.response.send;
+  app.response.send = function(body) {
+    if (typeof body === 'string' && this.get('Content-Type') && this.get('Content-Type').includes('text/html')) {
+      body = body.replace('</body>', config.analyticsBody + '</body>');
+      // 重新计算 Content-Length（如果已设置）
+      if (this.get('Content-Length')) {
+        this.set('Content-Length', Buffer.byteLength(body));
+      }
+    }
+    return originalSend.call(this, body);
+  };
+}
+
 // 统计中间件（记录 PV 和 API 调用）
 app.use(stats.trackingMiddleware);
 

@@ -73,6 +73,9 @@ const config = {
   // ─── ICP 备案号 ───
   icpBeian: (process.env.ICP_BEIAN || '').trim(),
 
+  // ─── 统计分析代码（注入到 </body> 前） ───
+  analyticsBody: (process.env.ANALYTICS_BODY || '').trim(),
+
   // ─── 网站域名 ───
   siteURL: (process.env.SITE_URL || 'http://localhost:6688').replace(/\/+$/, ''),
 
