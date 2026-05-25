@@ -519,6 +519,28 @@ app.get('/api/stats', limiter, (req, res) => {
   });
 });
 
+// ── 诊断：查看请求头（调试 CDN IP 问题用） ──
+app.get('/api/debug-headers', (req, res) => {
+  res.json({
+    success: true,
+    ip: req.ip,
+    ips: req.ips,
+    remoteAddress: req.socket.remoteAddress,
+    connectionRemote: req.connection.remoteAddress,
+    headers: {
+      'cf-connecting-ip': req.headers['cf-connecting-ip'] || null,
+      'true-client-ip': req.headers['true-client-ip'] || null,
+      'ali-cdn-real-ip': req.headers['ali-cdn-real-ip'] || null,
+      'x-real-ip': req.headers['x-real-ip'] || null,
+      'x-forwarded-for': req.headers['x-forwarded-for'] || null,
+      'x-forwarded-proto': req.headers['x-forwarded-proto'] || null,
+      'host': req.headers['host'] || null,
+      'user-agent': req.headers['user-agent'] ? req.headers['user-agent'].slice(0, 80) : null
+    },
+    getClientIP: getClientIP(req)
+  });
+});
+
 // ── 健康检查 ──
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', uptime: process.uptime() });
