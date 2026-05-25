@@ -76,29 +76,6 @@ app.use((req, res, next) => {
 // CC 防护（纯 Node 实现，必须放在最前面）
 app.use(ccProtection);
 
-// 统计分析代码注入（必须在 compression 之前，拦截原始 HTML）
-if (config.analyticsBody) {
-  app.use((req, res, next) => {
-    if (req.path.startsWith('/api/')) return next();
-    const chunks = [];
-    const _write = res.write.bind(res);
-    const _end = res.end.bind(res);
-    res.write = function(chunk, encoding, cb) {
-      if (chunk) chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk, encoding));
-      return true;
-    };
-    res.end = function(chunk, encoding, cb) {
-      if (chunk) chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk, encoding));
-      let body = Buffer.concat(chunks).toString('utf8');
-      if (body && (res.get('Content-Type') || '').includes('text/html')) {
-        body = body.replace('</body>', '<script>setTimeout(function(){' + config.analyticsBody + '},0);<\/script></body>');
-      }
-      return _end(body);
-    };
-    next();
-  });
-}
-
 // 压缩中间件（在静态文件之前）
 app.use(compression());
 
