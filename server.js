@@ -125,6 +125,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 function getClientIP(req) {
   // CDN 专用头（优先）
   const cdnHeaders = [
+    'ali-real-client-ip',    // 阿里云 ESA
     'cf-connecting-ip',      // Cloudflare
     'true-client-ip',        // Cloudflare / 阿里云 / Google Cloud
     'ali-cdn-real-ip',       // 阿里云 CDN
