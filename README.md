@@ -260,24 +260,31 @@ server {
 | Nginx 反代 | `X-Real-IP` | ✅ |
 | 通用 | `X-Forwarded-For`（取第一个） | ✅ |
 
-> **注意**：使用 CDN 时需要在 Nginx 中配置 `real_ip_header`，否则 Nginx 日志和 `$remote_addr` 仍是 CDN IP。示例（阿里云 ESA/DCDN）：
+> **使用 CDN 时需要配置两处：**
+
+> **1. CDN 侧 — 开启真实 IP 传递：**
+>
+> * **阿里云 ESA**：ESA 控制台 → 站点 → **规则设置 → 转换规则** → 新增请求头规则，将真实客户端 IP 通过 `X-Forwarded-For` 传递给源站。
+> * **Cloudflare**：默认已开启，无需额外配置。
+>
+> **2. Nginx 侧 — 信任代理 IP：**
 >
 > ```nginx
 > server {
->     # 阿里云 ESA CDN 真实IP
 >     set_real_ip_from 0.0.0.0/0;
->     real_ip_header Ali-CDN-Real-IP;
+>     real_ip_header X-Forwarded-For;
 >     real_ip_recursive on;
 >
 >     location / {
 >         proxy_pass http://127.0.0.1:6688;
->         proxy_set_header Ali-CDN-Real-IP $http_ali_cdn_real_ip;
+>         proxy_set_header X-Real-IP $remote_addr;
+>         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 >         ...
 >     }
 > }
 > ```
 >
-> Cloudflare 用户将 `Ali-CDN-Real-IP` 替换为 `CF-Connecting-IP`。
+> Cloudflare 用户将 `real_ip_header` 改为 `CF-Connecting-IP`。
 
 ## 第三方API推荐
 
