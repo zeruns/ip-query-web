@@ -181,7 +181,6 @@ vim .env               # 按需修改
 |------|--------|------|
 | `GITHUB_MIRROR` | `https://gh-proxy.com/` | GitHub 镜像加速地址。境内服务器必配，境外留空直连 |
 | `DATA_DIR` | `./data` | IP 数据库和统计文件存放目录 |
-| `ANALYTICS_BODY` | 空 | 百度/Google 统计代码，填入完整 `<script>` 标签内容，留空不注入 |
 
 ### HTTPS 配置
 
@@ -261,6 +260,7 @@ server {
 | CDN / 代理 | 请求头 | 自动识别 |
 |-----------|-------|:---:|
 | Cloudflare | `CF-Connecting-IP` | ✅ |
+| 阿里云 ESA | `ali-real-client-ip` | ✅ |
 | Cloudflare / 阿里云 / Google Cloud | `True-Client-IP` | ✅ |
 | 阿里云 CDN | `Ali-CDN-Real-IP` | ✅ |
 | Nginx 反代 | `X-Real-IP` | ✅ |

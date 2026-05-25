@@ -57,32 +57,16 @@ const config = {
   // ─── 数据目录 ───
   dataDir: path.resolve(process.env.DATA_DIR || './data'),
 
-  // ─── 外部公网 IP 查询源 ───
-  publicIPSources: (process.env.PUBLIC_IP_SOURCES ||
-    'https://ipinfo.io/ip,https://api.ipify.org,https://checkip.amazonaws.com')
-    .split(',')
-    .map(s => s.trim())
-    .filter(Boolean),
-
   // ─── 日志级别 ───
   logLevel: (process.env.LOG_LEVEL || 'info').toLowerCase(),
 
   // ─── GitHub 镜像（用于下载 IP 数据库） ───
   githubMirror: (process.env.GITHUB_MIRROR || '').replace(/\/+$/, ''),
 
-  // ─── ICP 备案号 ───
-  icpBeian: (process.env.ICP_BEIAN || '').trim(),
-
-  // ─── 统计分析代码（注入到 </body> 前） ───
-  analyticsBody: (process.env.ANALYTICS_BODY || '').trim(),
-
-  // ─── 网站域名 ───
-  siteURL: (process.env.SITE_URL || 'http://localhost:6688').replace(/\/+$/, ''),
-
   // ─── 应用信息 ───
   app: {
     name: 'IP 归属地查询系统',
-    version: '2.0.0',
+    version: '2.1.3',
     description: '纯真IP库在线查询 - 支持IPv4/IPv6/域名解析',
   },
 };

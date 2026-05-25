@@ -455,7 +455,7 @@ app.post('/api/batch', limiter, (req, res) => {
   res.json({ success: true, count: results.length, results });
 });
 
-// ── 7. GET /api/status — 数据库状态 ──
+// ── 9. GET /api/status — 数据库状态 ──
 app.get('/api/status', limiter, (req, res) => {
   respond(req, res,
     // JSON
@@ -584,7 +584,7 @@ if (config.ssl && config.ssl.key && config.ssl.cert) {
 
 httpServer.listen(PORT, HOST, () => {
   console.log('==================================================');
-  console.log('  纯真IP库在线查询系统 v2.0 (模块化架构)');
+  console.log('  纯真IP库在线查询系统 v2.1 (模块化架构)');
   console.log('==================================================');
   console.log(`  服务地址:  http://${HOST}:${PORT}`);
   console.log(`  本地访问:  http://127.0.0.1:${PORT}`);

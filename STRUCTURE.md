@@ -73,7 +73,7 @@ ip-query-web/
 #### `src/config.js` — 统一配置层
 
 - 从环境变量读取所有配置项
-- 支持 `.env` 文件（由 `start.sh` 加载）
+- 支持 `.env` 文件（由 `server.js` 通过 `dotenv` 库自动加载）
 - 所有值均有合理默认值，开箱即用
 - 配置项包括：端口、限流参数、CC 防护、DNS 服务器、GitHub 镜像加速、SSL 证书等
 
@@ -185,6 +185,7 @@ DNS 解析策略：系统 DNS → Google Public DNS (8.8.8.8/8.8.4.4) → 中国
 |------|------|------|
 | `express` | 4.18.2 | Web 框架 |
 | `compression` | ^1.8.1 | HTTP 响应压缩中间件 |
+| `dotenv` | ^16.4.0 | 环境变量加载（.env 文件） |
 | `express-rate-limit` | ^8.5.2 | API 限流 |
 | `ipdb` | 0.4.0 | IP 数据库解析引擎 |
 | `node-cron` | ^3.0.2 | 定时任务（IP 库自动更新） |
