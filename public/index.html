@@ -127,7 +127,7 @@
     .ip-entry:hover { background: rgba(255,255,255,0.06); border-color: rgba(108,99,255,0.2); }
     .ip-entry:last-child { margin-bottom: 0; }
     .ip-entry-badge { flex-shrink: 0; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
-    .ip-entry-addr { flex: 1; min-width: 0; color: rgba(255,255,255,0.85); font-family: 'SF Mono','Fira Code','Consolas',monospace; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ip-entry-addr { flex: 1; min-width: 0; color: rgba(255,255,255,0.85); font-family: 'SF Mono','Fira Code','Consolas',monospace; font-size: 13px; }
     .ip-entry-loc { flex-shrink: 0; color: rgba(255,255,255,0.4); font-size: 12px; text-align: right; max-width: 40%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .ip-entry-detail {
       display: none; grid-template-columns: 1fr 1fr; gap: 8px;
@@ -137,7 +137,7 @@
     .ip-entry-detail.show { display: grid; }
     .ip-entry-detail .detail-item { padding: 4px 0; }
     .ip-entry-detail .detail-label { color: rgba(255,255,255,0.3); font-size: 11px; }
-    .ip-entry-detail .detail-value { color: rgba(255,255,255,0.8); font-size: 13px; overflow: hidden; text-overflow: ellipsis; }
+    .ip-entry-detail .detail-value { color: rgba(255,255,255,0.8); font-size: 13px; word-break: break-all; }
     .ip-entry .arrow { flex-shrink: 0; color: rgba(255,255,255,0.2); font-size: 12px; transition: transform 0.2s; }
     .ip-entry.open .arrow { transform: rotate(90deg); }
 
@@ -164,9 +164,9 @@
       .result-card { padding: 16px; }
       .result-header { flex-direction: column; }
       .result-ip { font-size: 17px; }
-      .ip-entry { flex-wrap: nowrap; overflow-x: auto; }
-      .ip-entry-addr { font-size: 12px; }
-      .ip-entry-loc { text-align: left; max-width: 100%; white-space: normal; padding-left: 0; margin-top: 0; font-size: 11px; }
+      .ip-entry { flex-wrap: wrap; gap: 4px; }
+      .ip-entry-addr { flex: 1 0 100%; min-width: 0; font-size: 12px; word-break: break-all; }
+      .ip-entry-loc { flex: 1 0 100%; text-align: left; max-width: 100%; white-space: normal; font-size: 11px; padding-top: 2px; }
       .ip-entry-detail { padding: 10px 12px 6px; }
     }
   </style>
