@@ -2,7 +2,8 @@
 
 <p align="center">
   <strong>Precise IP geolocation service powered by CZ88.NET IP database</strong><br>
-  Supports IPv4 / IPv6 / Domain Resolution · Dual-format API (JSON + TXT) · Dark Web UI · Bilingual (Chinese/English)
+  Supports IPv4 / IPv6 / Domain Resolution · Dual-format API (JSON + TXT) · Dark Web UI · Bilingual (Chinese/English)<br>
+  <sub>AI-assisted project — design and code generated with AI</sub>
 </p>
 
 <p align="center">
@@ -337,7 +338,8 @@ IP geolocation data comes from [CZ88.NET IP Database](https://github.com/nmglian
 
 Need a server to deploy this project? Check out these recommendations:
 
-👉 [VPS/Cloud Server Recommendations](https://blog.vpszj.cn/archives/41.html)
+- 👉 [VPS/Cloud Server Recommendations](https://blog.vpszj.cn/archives/41.html)
+- 👉 [Alibaba Cloud Server (Offers)](https://www.aliyun.com/minisite/goods?userCode=jdjc69nf)
 
 ## Recommended Reading
 

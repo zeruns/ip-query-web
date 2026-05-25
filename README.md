@@ -2,7 +2,8 @@
 
 <p align="center">
   <strong>基于纯真IP库的精确地理定位服务</strong><br>
-  支持 IPv4 / IPv6 / 域名解析 · 双格式 API（JSON + TXT）· 自带暗色 Web 界面 · 中英文双语切换
+  支持 IPv4 / IPv6 / 域名解析 · 双格式 API（JSON + TXT）· 自带暗色 Web 界面 · 中英文双语切换<br>
+  <sub>本项目的设计与代码由 AI 辅助生成</sub>
 </p>
 
 <p align="center">
@@ -335,9 +336,10 @@ IP 地理位置数据来自 [纯真 IP 库 (CZ88.NET)](https://github.com/nmglia
 
 ## VPS/云服务器推荐
 
-需要服务器部署本项目？可参考这篇推荐：
+需要服务器部署本项目？可参考以下推荐：
 
-👉 [VPS/云服务器推荐列表](https://blog.vpszj.cn/archives/41.html)
+- 👉 [VPS/云服务器推荐列表](https://blog.vpszj.cn/archives/41.html)
+- 👉 [阿里云服务器（优惠）](https://www.aliyun.com/minisite/goods?userCode=jdjc69nf)
 
 ## 推荐阅读
 
