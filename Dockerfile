@@ -12,7 +12,7 @@ FROM node:18-alpine
 
 LABEL org.opencontainers.image.title="IP Query Web"
 LABEL org.opencontainers.image.description="纯真IP库在线查询系统 - 支持IPv4/IPv6/域名解析"
-LABEL org.opencontainers.image.version="2.0.0"
+LABEL org.opencontainers.image.version="2.1.1"
 
 # 安装运行时依赖（dns 工具等）
 RUN apk add --no-cache bind-tools curl ca-certificates tzdata
@@ -24,11 +24,11 @@ COPY --from=builder /app/node_modules ./node_modules
 
 # 复制应用代码
 COPY package.json ./
+COPY server.js ./
 COPY src/ ./src/
 COPY public/ ./public/
 COPY cli.js ./
-COPY start.sh ./
 
-# 启动入口
+# 启动入口（Docker 中环境变量通过 compose 传入，无需 start.sh 加载 .env）
 EXPOSE 6688
-CMD ["/app/start.sh"]
+CMD ["node", "server.js"]

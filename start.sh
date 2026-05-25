@@ -40,7 +40,7 @@ echo "  ╚═══════════════════════
 echo ""
 echo "  服务地址:  http://${HOST}:${PORT}"
 echo "  数据目录:  ${DATA_DIR}"
-echo "  限流配置:  ${RATE_LIMIT_MAX:-120}次/分钟 (普通) / ${RATE_LIMIT_SENSITIVE:-5}次/分钟 (敏感)"
+echo "  限流配置:  ${RATE_LIMIT_MAX:-120}次/分钟 (普通) / ${RATE_LIMIT_DNS:-30}次/分钟 (DNS)"
 echo "  DNS 服务器: ${PUBLIC_DNS:-8.8.8.8,8.8.4.4}"
 echo ""
 

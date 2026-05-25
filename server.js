@@ -5,6 +5,9 @@
  * 所有 API 支持 JSON 和纯文本双格式
  */
 
+// 加载 .env 环境变量（优先级低于已有进程环境变量）
+try { require('dotenv').config(); } catch(e) {}
+
 const express = require('express');
 const compression = require('compression');
 const path = require('path');
