@@ -1,4 +1,4 @@
-version: "3.8"
+version: "3"
 
 services:
   ip-query-web:
@@ -14,9 +14,9 @@ services:
       # 环境变量配置（可选）
       - ./.env:/app/.env:ro
     environment:
-      # 以下变量可写在这里，也可通过 .env 文件设置
-      - PORT=6688
-      - HOST=::
-      - TZ=Asia/Shanghai
-    # 以下与 start.sh 配合，自动加载 .env
-    # 如果不想用 .env 文件，直接在 environment 中设置即可
+      # 映射格式（兼容 V1 docker-compose）
+      PORT: "6688"
+      HOST: "::"
+      TZ: "Asia/Shanghai"
+      GITHUB_MIRROR: "https://gh-proxy.com/"
+    # 更多配置可通过挂载的 .env 文件或在此 environment 中设置

@@ -57,8 +57,11 @@ node server.js
 ### 方式三：Docker 部署
 
 ```bash
-# 构建并启动
+# Docker Compose V2（Docker Desktop / Docker Engine 20.10+）
 docker compose up -d --build
+
+# Docker Compose V1（旧版，命令带横线）
+docker-compose up -d --build
 
 # 查看日志
 docker compose logs -f
