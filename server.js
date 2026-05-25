@@ -135,19 +135,29 @@ function getClientIP(req) {
     'x-real-ip',             // Nginx
     'x-forwarded-for',       // 通用（取第一个）
   ];
+  let ip = null;
   for (const header of cdnHeaders) {
     const value = req.headers[header];
     if (value) {
       if (header === 'x-forwarded-for') {
         // X-Forwarded-For: client, proxy1, proxy2 → 取第一个
-        const firstIP = value.split(',')[0].trim();
-        if (firstIP) return firstIP;
+        ip = value.split(',')[0].trim();
+        if (ip) break;
+      } else {
+        ip = value.trim();
+        break;
       }
-      return value.trim();
     }
   }
-  // Express req.ip（受 trust proxy 设置影响）
-  return req.ip || req.socket.remoteAddress;
+  if (!ip) {
+    // Express req.ip（受 trust proxy 设置影响）
+    ip = req.ip || req.socket.remoteAddress;
+  }
+  // 过滤 IPv4-mapped IPv6 格式（双栈监听时 IPv4 连接会被映射为 ::ffff:x.x.x.x）
+  if (ip && ip.startsWith('::ffff:')) {
+    ip = ip.slice(7);
+  }
+  return ip;
 }
 
 /**
