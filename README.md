@@ -250,7 +250,7 @@ server {
 
 ### CDN 兼容
 
-系统通过 `getClientIP()` 函数智能识别客户端真实 IP，优先级从高到低：
+系统通过 `getClientIP()` 智能识别客户端真实 IP，优先级从高到低：
 
 | CDN / 代理 | 请求头 | 自动识别 |
 |-----------|-------|:---:|
@@ -259,6 +259,25 @@ server {
 | 阿里云 CDN | `Ali-CDN-Real-IP` | ✅ |
 | Nginx 反代 | `X-Real-IP` | ✅ |
 | 通用 | `X-Forwarded-For`（取第一个） | ✅ |
+
+> **注意**：使用 CDN 时需要在 Nginx 中配置 `real_ip_header`，否则 Nginx 日志和 `$remote_addr` 仍是 CDN IP。示例（阿里云 ESA/DCDN）：
+>
+> ```nginx
+> server {
+>     # 阿里云 ESA CDN 真实IP
+>     set_real_ip_from 0.0.0.0/0;
+>     real_ip_header Ali-CDN-Real-IP;
+>     real_ip_recursive on;
+>
+>     location / {
+>         proxy_pass http://127.0.0.1:6688;
+>         proxy_set_header Ali-CDN-Real-IP $http_ali_cdn_real_ip;
+>         ...
+>     }
+> }
+> ```
+>
+> Cloudflare 用户将 `Ali-CDN-Real-IP` 替换为 `CF-Connecting-IP`。
 
 ## 第三方API推荐
 
