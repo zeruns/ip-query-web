@@ -93,7 +93,6 @@ if (config.analyticsBody) {
       if (body && (res.get('Content-Type') || '').includes('text/html')) {
         body = body.replace('</body>', '<script>setTimeout(function(){' + config.analyticsBody + '},0);<\/script></body>');
       }
-      res.set('Content-Length', Buffer.byteLength(body));
       return _end(body);
     };
     next();
