@@ -89,7 +89,8 @@ app.use((req, res, next) => {
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.setHeader('X-Permitted-Cross-Domain-Policies', 'none');
   // Content-Security-Policy（inline style 因全站 CSS 内联，需 unsafe-inline）
-  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
+  // script-src 允许 CDN 加载 Chart.js 和统计脚本
+  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://hm.baidu.com https://www.googletagmanager.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
   // HSTS：仅 HTTPS 场景生效（Nginx SSL 终端时由 Nginx 设置更合适）
   if (config.ssl && config.ssl.key && config.ssl.cert) {
     res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
@@ -686,7 +687,7 @@ if (config.ssl && config.ssl.key && config.ssl.cert) {
 
 httpServer.listen(PORT, HOST, () => {
   console.log('==================================================');
-  console.log('  纯真IP库在线查询系统 v2.2.1 (模块化架构)');
+  console.log('  纯真IP库在线查询系统 v2.2.2 (模块化架构)');
   console.log('==================================================');
   console.log(`  服务地址:  http://${HOST}:${PORT}`);
   console.log(`  本地访问:  http://127.0.0.1:${PORT}`);
