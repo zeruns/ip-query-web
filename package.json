@@ -1,6 +1,6 @@
 {
   "name": "ip-query-web",
-  "version": "2.1.7",
+  "version": "2.1.8",
   "description": "纯真IP库在线查询系统 - 支持IPv4/IPv6/域名查询",
   "main": "server.js",
   "scripts": {

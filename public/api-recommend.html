@@ -249,13 +249,14 @@ const API_SOURCES = [
   {
     id: 'ip-api',
     name: 'ip-api.com',
-    url: ip => ip ? `/api/recommend/ip-api?q=${ip}` : `/api/recommend/ip-api`,
+    httpOnly: true,
+    url: ip => `http://ip-api.com/json/${ip ? ip : ''}?lang=zh-CN`,
     parse: d => ({
       ip: d.query, country: d.country, region: d.regionName, city: d.city,
       isp: d.isp, org: d.org, lat: d.lat, lon: d.lon, timezone: d.timezone
     }),
     link: 'https://ip-api.com/',
-    doc: '无需注册，免费调用。限制：45次/分钟。免费版仅支持 HTTP，本站通过服务端代理实现 HTTPS 访问。返回 JSON/XML/CSV 格式。'
+    doc: '无需注册，免费调用。限制：45次/分钟。免费版仅支持 HTTP，HTTPS 页面因浏览器安全策略无法直接调用。'
   },
   {
     id: 'ip-sb',
@@ -411,6 +412,12 @@ async function querySingleAPI(src) {
   if (currentIP && src.selfOnly) {
     setStatus(src.id, 'error', '❌ ' + __t('apiRecommend.fail'));
     renderError(src.id, __t('apiRecommend.selfOnlyError'));
+    return;
+  }
+  // 若当前页面为 HTTPS 但该 API 仅支持 HTTP，直接提示
+  if (src.httpOnly && location.protocol === 'https:') {
+    setStatus(src.id, 'error', '❌ ' + __t('apiRecommend.fail'));
+    renderError(src.id, __t('apiRecommend.httpOnlyError'));
     return;
   }
   setStatus(src.id, 'loading', __t('apiRecommend.loading'));
