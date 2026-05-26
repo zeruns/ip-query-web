@@ -355,6 +355,16 @@ IP 地理位置数据来自 [纯真 IP 库 (CZ88.NET)](https://github.com/nmglia
 - 阿里云ESA（CDN）测评，免费不限流量，全球节点（含境内）：[https://blog.zeruns.com/archives/920.html](https://blog.zeruns.com/archives/920.html)
 - Discourse论坛搭建教程，零基础部署Discourse开源社区论坛网站：[https://blog.zeruns.com/archives/919.html](https://blog.zeruns.com/archives/919.html)
 
+## 更新日志
+
+### v2.1.5 (2026-05-26)
+
+- 统计代码集中化重构：新增 `public/tracking.js` 统一管理百度/Google/Cloudflare 统计
+- 4 个 HTML 页面改用 `<script src="/tracking.js">` 替代内联百度统计脚本
+- `footer.html` 移除 Google Analytics 和 Cloudflare Web Analytics 内联脚本
+- 统计 ID 统一使用占位符，部署时替换为实际值
+- 更新 STRUCTURE.md 补充 tracking.js 说明
+
 ## 许可证
 
 [GNU General Public License v3.0](LICENSE)

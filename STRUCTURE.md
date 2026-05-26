@@ -40,13 +40,14 @@ ip-query-web/
 │   ├── api-docs.html            # API 文档页（在线测试）
 │   ├── api-recommend.html       # 第三方 API 对比页面
 │   ├── stats.html               # 统计面板（Chart.js 图表）
+│   ├── tracking.js               # 统一统计代码（百度/Google/Cloudflare，模板）
 │   ├── i18n.js                  # 中英文双语切换引擎
 │   ├── classifier.js            # 智能分类器（浏览器版）
 │   ├── favicon.ico              # 网站图标
 │   ├── favicon.png              # 网站图标（PNG 格式）
 │   ├── components/              # 共享组件
 │   │   ├── header.html          # 页头（导航栏 + 语言切换）
-│   │   └── footer.html          # 页尾（友情链接 + ICP备案 + 统计代码）
+│   │   └── footer.html          # 页尾（友情链接 + ICP备案）
 │   └── lang/                    # 翻译文件
 │       ├── zh-CN.json           # 中文翻译
 │       └── en.json              # 英文翻译
@@ -134,6 +135,7 @@ DNS 解析策略：系统 DNS → Google Public DNS (8.8.8.8/8.8.4.4) → 中国
 | `api-docs.html` | API 文档页，每个接口带在线测试按钮 |
 | `api-recommend.html` | 第三方 IP 查询 API 对比推荐页面 |
 | `stats.html` | 网站统计面板，Chart.js 复合图表（折线+柱状） |
+| `tracking.js` | 统一统计代码，聚合百度/Google/Cloudflare 三个平台，使用占位符 ID |
 | `i18n.js` | 中英文切换引擎，支持浏览器语言检测和手动切换 |
 | `components/header.html` | 页头导航栏组件（含语言切换按钮） |
 | `components/footer.html` | 页尾组件（友情链接、备案号、统计代码） |
