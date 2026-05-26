@@ -22,6 +22,8 @@ const config = {
     max: parseInt(process.env.RATE_LIMIT_MAX, 10) || 120,
     // 域名解析接口：次/分钟/IP
     dns: parseInt(process.env.RATE_LIMIT_DNS, 10) || 30,
+    // 页面/静态资源：次/分钟/IP
+    page: parseInt(process.env.RATE_LIMIT_PAGE, 10) || 120,
   },
 
   // ─── CC 防护配置（纯 Node 实现，不依赖系统防火墙） ───
@@ -66,7 +68,7 @@ const config = {
   // ─── 应用信息 ───
   app: {
     name: 'IP 归属地查询系统',
-    version: '2.1.12',
+    version: '2.1.13',
     description: '纯真IP库在线查询 - 支持IPv4/IPv6/域名解析',
   },
 };

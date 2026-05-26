@@ -91,6 +91,18 @@ app.use((req, res, next) => {
 // 统计中间件（记录 PV 和 API 调用）
 app.use(stats.trackingMiddleware);
 
+// 页面/静态资源限流（API 路由有独立限流，此处跳过）
+const pageLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: config.rateLimit.page,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: (req) => req.path.startsWith('/api/'),
+  message: `请求过于频繁，请稍后再试 (限流: ${config.rateLimit.page}次/分钟/IP)`,
+  keyGenerator: rateLimitKey
+});
+app.use(pageLimiter);
+
 // 请求日志（简化）
 app.use((req, res, next) => {
   const start = Date.now();
@@ -628,7 +640,7 @@ if (config.ssl && config.ssl.key && config.ssl.cert) {
 
 httpServer.listen(PORT, HOST, () => {
   console.log('==================================================');
-  console.log('  纯真IP库在线查询系统 v2.1.12 (模块化架构)');
+  console.log('  纯真IP库在线查询系统 v2.1.13 (模块化架构)');
   console.log('==================================================');
   console.log(`  服务地址:  http://${HOST}:${PORT}`);
   console.log(`  本地访问:  http://127.0.0.1:${PORT}`);

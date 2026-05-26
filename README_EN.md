@@ -74,7 +74,7 @@ Add a Node.js project in aaPanel, with start command `node server.js` and port 6
 
 ## Features
 
-- **IPv4 / IPv6 dual-stack** — Geolocation queries for both protocols
+- **IPv4 / IPv6 dual-stack dual-DB** — IPv4 uses CZ88 Dat format (qqwry.dat), IPv6 uses IPIP.net format (qqwry.ipdb) for better accuracy
 - **Domain resolution** — Auto-resolve A/AAAA records and query each resolved IP
 - **Dual-format API** — JSON and plaintext (`.txt`) output for different scenarios
 - **Dark web UI** — Built-in query page, API docs, and statistics dashboard
@@ -82,7 +82,7 @@ Add a Node.js project in aaPanel, with start command `node server.js` and port 6
 - **CLI tool** — `node cli.js <IP/domain>` for terminal queries
 - **Auto-updating IP database** — Auto-fetches latest CZ88.NET IP database every Monday at 3:00 AM (supports GitHub mirror acceleration)
 - **Website statistics** — PV and API call tracking with Chart.js visualization
-- **Three-layer security** — CC protection + tiered rate limiting + security headers
+- **Three-layer security** — CC protection + tiered rate limiting (API 120/min, DNS 30/min, pages 120/min) + security headers
 
 ## API Endpoints
 
@@ -151,6 +151,7 @@ vim .env               # Edit as needed
 |------|--------|------|
 | `RATE_LIMIT_MAX` | `120` | Standard API rate limit (req/min/IP) |
 | `RATE_LIMIT_DNS` | `30` | Domain query rate limit (involves DNS resolution, stricter) |
+| `RATE_LIMIT_PAGE` | `120` | Page/static resource rate limit (req/min/IP) |
 
 ### CC Protection Configuration
 

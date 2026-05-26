@@ -342,7 +342,22 @@ function esc(s) {
   return d.innerHTML;
 }
 
-function __t(key) { return (window.I18N && window.I18N.t ? window.I18N.t(key) : null) || key; }
+function __t(key) {
+  // 优先从 I18N 获取翻译
+  if (window.I18N && window.I18N.t) {
+    const val = window.I18N.t(key);
+    if (val) return val;
+  }
+  // I18N 未加载时使用硬编码中文 fallback（避免显示原始 key）
+  var fallbacks = {
+    'apiRecommend.fail': '失败',
+    'apiRecommend.loading': '正在查询...',
+    'apiRecommend.success': '成功',
+    'apiRecommend.selfOnlyError': '该 API 仅支持查询访问者自身 IP，不支持输入指定 IP 地址',
+    'apiRecommend.httpOnlyError': '该 API 免费版仅支持 HTTP，HTTPS 页面无法直接调用，请访问官网使用'
+  };
+  return fallbacks[key] || key;
+}
 
 function initGrid() {
   const grid = qs('apiGrid');
