@@ -249,14 +249,13 @@ const API_SOURCES = [
   {
     id: 'ip-api',
     name: 'ip-api.com',
-    httpOnly: true,
-    url: ip => `http://ip-api.com/json/${ip ? ip : ''}?lang=zh-CN`,
+    url: ip => ip ? `/api/recommend/ip-api?q=${ip}` : `/api/recommend/ip-api`,
     parse: d => ({
       ip: d.query, country: d.country, region: d.regionName, city: d.city,
       isp: d.isp, org: d.org, lat: d.lat, lon: d.lon, timezone: d.timezone
     }),
     link: 'https://ip-api.com/',
-    doc: '无需注册，免费调用。限制：45次/分钟。免费版仅支持 HTTP，HTTPS 页面因浏览器安全策略无法直接调用。返回 JSON/XML/CSV 格式。'
+    doc: '无需注册，免费调用。限制：45次/分钟。免费版仅支持 HTTP，本站通过服务端代理实现查询（不暴露服务器公网 IP）。返回 JSON/XML/CSV 格式。'
   },
   {
     id: 'ip-sb',

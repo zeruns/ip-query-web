@@ -136,7 +136,7 @@
   },
   "apiDesc": {
     "ipip": "Free lookup API from IPIP.NET, a commercial IP database vendor. No registration required. Returns plain text (current IP + location). Only supports visitor's own IP query; UA header required since 2024.",
-    "ip-api": "No registration, free. Limit: 45 req/min. Free tier HTTP only; cannot be called from HTTPS pages due to browser security. Returns JSON/XML/CSV.",
+    "ip-api": "No registration, free. Limit: 45 req/min. Free tier HTTP only; proxied via our server without exposing our public IP. Returns JSON/XML/CSV.",
     "ip-sb": "No registration, no explicit rate limit. Supports IPv4/IPv6. Returns JSON. Accessible from China.",
     "geojsio": "Free, no registration, no rate limit. Returns JSON/JSONP with ASN/coordinates/timezone/continent. Supports IPv4/IPv6.",
     "ipapi-is": "Free HTTPS API focused on security (proxy/VPN/TOR/datacenter detection). Returns JSON with ASN/company/abuse info.",

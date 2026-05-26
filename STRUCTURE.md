@@ -165,6 +165,7 @@ DNS 解析策略：系统 DNS → Google Public DNS (8.8.8.8/8.8.4.4) → 中国
 | `GET /api/info` | 数据库信息 | 120次/分钟 |
 | `GET /api/status` | 数据库状态 | 120次/分钟 |
 | `GET /api/stats?range=daily\|weekly\|monthly\|yearly` | 网站统计 | 120次/分钟 |
+| `GET /api/recommend/ip-api?q={ip}` | ip-api.com 代理(不暴露服务器IP) | 120次/分钟 |
 | `POST /api/batch` | 批量 IP 查询（≤50） | 120次/分钟 |
 | `GET /health` | 健康检查 | 无限制 |
 
