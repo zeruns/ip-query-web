@@ -66,7 +66,7 @@ const config = {
   // ─── 应用信息 ───
   app: {
     name: 'IP 归属地查询系统',
-    version: '2.1.5',
+    version: '2.1.6',
     description: '纯真IP库在线查询 - 支持IPv4/IPv6/域名解析',
   },
 };
