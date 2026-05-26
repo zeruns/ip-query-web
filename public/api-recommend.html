@@ -228,6 +228,7 @@ const API_SOURCES = [
   {
     id: 'ipip',
     name: 'IPIP.NET',
+    selfOnly: true,
     url: () => `https://myip.ipip.net`,
     parse: d => {
       // 返回纯文本：当前 IP：110.42.101.53  来自于：中国 浙江 宁波  电信
@@ -306,13 +307,13 @@ const API_SOURCES = [
   {
     id: 'freeipapi',
     name: 'freeipapi.com',
-    url: ip => ip ? `https://freeipapi.com/api/json/${ip}` : `https://freeipapi.com/api/json`,
+    url: ip => ip ? `https://free.freeipapi.com/api/json/${ip}` : `https://free.freeipapi.com/api/json`,
     parse: d => ({
       ip: d.ipAddress, country: d.countryName, region: d.regionName, city: d.cityName,
       isp: d.isp, org: d.organization, lat: d.latitude, lon: d.longitude, timezone: (d.timeZones || [])[0] || ''
     }),
     link: 'https://freeipapi.com/',
-    doc: '免费 HTTPS 接口，无需注册，无明确频率限制。返回 JSON 格式，含国家/城市/ISP/坐标/时区/ASN。支持 IPv4/IPv6。'
+    doc: '免费 HTTPS 接口，无需注册，限制 60次/分钟。返回 JSON 格式，含国家/城市/ISP/坐标/时区/ASN。支持 IPv4/IPv6。'
   },
   {
     id: 'ipinfo',
@@ -406,6 +407,12 @@ function renderError(srcId, errMsg) {
 }
 
 async function querySingleAPI(src) {
+  // 若用户提供了 IP 但该 API 仅支持查询自身 IP，直接提示
+  if (currentIP && src.selfOnly) {
+    setStatus(src.id, 'error', '❌ ' + __t('apiRecommend.fail'));
+    renderError(src.id, __t('apiRecommend.selfOnlyError'));
+    return;
+  }
   setStatus(src.id, 'loading', __t('apiRecommend.loading'));
   try {
     const url = src.url(currentIP);

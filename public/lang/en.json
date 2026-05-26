@@ -56,7 +56,8 @@
     "fail": "Failed",
     "success": "Success",
     "pending": "Pending",
-    "visitSite": "🔗 Visit Site"
+    "visitSite": "🔗 Visit Site",
+    "selfOnlyError": "This API only supports querying the visitor's own IP, not a specified address"
   },
   "stats": {
     "title": "📊 Site Statistics",
@@ -139,7 +140,7 @@
     "geojsio": "Free, no registration, no rate limit. Returns JSON/JSONP with ASN/coordinates/timezone/continent. Supports IPv4/IPv6.",
     "ipapi-is": "Free HTTPS API focused on security (proxy/VPN/TOR/datacenter detection). Returns JSON with ASN/company/abuse info.",
     "iplocate-io": "Free HTTPS API, no registration. Returns JSON with detailed geo/ASN/coordinates/timezone. Supports IPv4/IPv6.",
-    "freeipapi": "Free HTTPS API, no registration, no rate limit. Returns JSON with country/city/ISP/coordinates/timezone/ASN. Supports IPv4/IPv6.",
+    "freeipapi": "Free HTTPS API, no registration. Rate limit: 60 req/min. Returns JSON with country/city/ISP/coordinates/timezone/ASN. Supports IPv4/IPv6.",
     "ipinfo": "Free tier 50,000 req/day. Token optional. Returns detailed geo/ASN/ISP with coordinates and timezone.",
     "local": "QQWry IP database (qqwry.ipdb). Local lookup, no rate limit. Supports IPv4/IPv6. No IP data sent to third parties."
   }

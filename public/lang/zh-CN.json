@@ -56,7 +56,8 @@
     "fail": "失败",
     "success": "成功",
     "pending": "待查询",
-    "visitSite": "🔗 访问官网"
+    "visitSite": "🔗 访问官网",
+    "selfOnlyError": "该 API 仅支持查询访问者自身 IP，不支持输入指定 IP 地址"
   },
   "stats": {
     "title": "📊 网站统计",
@@ -139,7 +140,7 @@
     "geojsio": "免费，无需注册，无明确频率限制。返回 JSON/JSONP 格式，含 ASN/坐标/时区/大洲。支持 IPv4/IPv6。",
     "ipapi-is": "免费 HTTPS 接口，侧重网络安全检测（代理/VPN/TOR/数据中心检测）。返回 JSON 格式，含 ASN/公司/滥用信息。",
     "iplocate-io": "免费 HTTPS 接口，无需注册。返回 JSON 格式，含详细地理位置/ASN/坐标/时区/隐私检测。支持 IPv4/IPv6。",
-    "freeipapi": "免费 HTTPS 接口，无需注册，无明确频率限制。返回 JSON 格式，含国家/城市/ISP/坐标/时区/ASN。支持 IPv4/IPv6。",
+    "freeipapi": "免费 HTTPS 接口，无需注册，限制 60次/分钟。返回 JSON 格式，含国家/城市/ISP/坐标/时区/ASN。支持 IPv4/IPv6。",
     "ipinfo": "免费用户每日 50,000 次。需注册 Token（可选）。返回详细地理/ASN/运营商信息，含坐标和时区。",
     "local": "基于纯真 IP 数据库 (qqwry.ipdb)，本地查询无频率限制。支持 IPv4/IPv6，不暴露公网 IP 给第三方。"
   }
