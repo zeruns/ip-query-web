@@ -6,7 +6,7 @@
  */
 
 // ── 单 IP 并发连接数记录 ──
-const activeConns = new Map();     // ip → Set<socket.id>
+const activeConns = new Map();     // ip → Map<socketId, timestamp>
 const connHist = new Map();        // ip → { count, time }
 const blockedIPs = new Map();      // ip → expire_time
 let totalBlocked = 0;
@@ -24,6 +24,7 @@ let config = {
 };
 
 // ── 定时清理 ──
+const CONN_STALE_TIMEOUT = 60000; // 60 秒无活动视为死连接
 setInterval(() => {
   const now = Date.now();
   for (const [ip, expire] of blockedIPs) {
@@ -31,6 +32,13 @@ setInterval(() => {
   }
   for (const [ip, h] of connHist) {
     if (now - h.time > 30000) connHist.delete(ip);
+  }
+  // 清理死连接（客户端异常断开未触发 close/finish 事件）
+  for (const [ip, conns] of activeConns) {
+    for (const [sockId, ts] of conns) {
+      if (now - ts > CONN_STALE_TIMEOUT) conns.delete(sockId);
+    }
+    if (conns.size === 0) activeConns.delete(ip);
   }
 }, 10000);
 
@@ -126,8 +134,8 @@ function ccProtection(req, res, next) {
 
   // ── 注册连接跟踪 ──
   const sockId = ++socketIdCounter;
-  if (!activeConns.has(ip)) activeConns.set(ip, new Set());
-  activeConns.get(ip).add(sockId);
+  if (!activeConns.has(ip)) activeConns.set(ip, new Map());
+  activeConns.get(ip).set(sockId, now);
 
   // ── 慢速攻击检测（请求超时） ──
   let bodyDone = false;
@@ -143,10 +151,10 @@ function ccProtection(req, res, next) {
   const cleanup = () => {
     bodyDone = true;
     clearTimeout(slowTimer);
-    const s = activeConns.get(ip);
-    if (s) {
-      s.delete(sockId);
-      if (s.size === 0) activeConns.delete(ip);
+    const conns = activeConns.get(ip);
+    if (conns) {
+      conns.delete(sockId);
+      if (conns.size === 0) activeConns.delete(ip);
     }
     res.removeListener('close', cleanup);
     res.removeListener('finish', cleanup);

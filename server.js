@@ -116,8 +116,15 @@ app.use((req, res, next) => {
 // JSON 解析
 app.use(express.json());
 
-// 静态文件
-app.use(express.static(path.join(__dirname, 'public')));
+// 静态文件（HTML 不缓存，其余 1 天）
+app.use(express.static(path.join(__dirname, 'public'), {
+  maxAge: '1d',
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.html')) {
+      res.setHeader('Cache-Control', 'no-cache');
+    }
+  }
+}));
 
 // ──────────── 工具函数 ────────────
 
@@ -549,43 +556,56 @@ app.get('/api/stats', limiter, (req, res) => {
 // 查自身 IP：无参数时用 getClientIP 获取用户真实 IP 再转发（响应中 query 为用户 IP）
 // 查指定 IP：直接转发 q 参数，响应中 query 为用户提供的 IP
 // 两种方式均不暴露服务器公网 IP
+// 使用 keepAlive Agent 复用连接 + 1 次超时重试
+
+const ipApiAgent = new http.Agent({ keepAlive: true, maxSockets: 10 });
+
+function doIpApiRequest(targetIP, res) {
+  return new Promise((resolve, reject) => {
+    const apiUrl = `http://ip-api.com/json/${encodeURIComponent(targetIP)}?lang=zh-CN`;
+    const proxyReq = http.get(apiUrl, { timeout: 8000, agent: ipApiAgent }, (proxyRes) => {
+      proxyRes.setTimeout(8000);
+      let body = '';
+      proxyRes.on('data', chunk => { body += chunk; });
+      proxyRes.on('end', () => {
+        if (proxyRes.headers['x-rl']) res.setHeader('X-Rl', proxyRes.headers['x-rl']);
+        if (proxyRes.headers['x-ttl']) res.setHeader('X-Ttl', proxyRes.headers['x-ttl']);
+        if (proxyRes.statusCode !== 200) {
+          if (proxyRes.statusCode === 429) {
+            return reject({ status: 429, msg: 'ip-api.com 请求频率过高，请稍后再试' });
+          }
+          return reject({ status: 502, msg: `ip-api.com 返回 HTTP ${proxyRes.statusCode}` });
+        }
+        try { resolve(JSON.parse(body)); }
+        catch (e) { reject({ status: 502, msg: 'ip-api.com 响应解析失败' }); }
+      });
+      proxyRes.on('timeout', () => { proxyRes.destroy(); reject({ status: 504, msg: 'ip-api.com 请求超时' }); });
+      proxyRes.on('error', (e) => reject({ status: 502, msg: `ip-api.com 请求失败: ${e.message}` }));
+    });
+    proxyReq.on('timeout', () => { proxyReq.destroy(); reject({ status: 504, msg: 'ip-api.com 请求超时' }); });
+    proxyReq.on('error', (e) => reject({ status: 502, msg: `ip-api.com 请求失败: ${e.message}` }));
+  });
+}
+
 app.get('/api/recommend/ip-api', limiter, (req, res) => {
   const q = (req.query.q || '').trim();
   const targetIP = q || getClientIP(req);
   if (!net.isIP(targetIP)) {
     return res.status(400).json({ success: false, error: '无法获取有效的 IP 地址' });
   }
-  const apiUrl = `http://ip-api.com/json/${encodeURIComponent(targetIP)}?lang=zh-CN`;
 
-  const proxyReq = http.get(apiUrl, { timeout: 8000 }, (proxyRes) => {
-    let body = '';
-    proxyRes.on('data', chunk => { body += chunk; });
-    proxyRes.on('end', () => {
-      if (proxyRes.headers['x-rl']) res.setHeader('X-Rl', proxyRes.headers['x-rl']);
-      if (proxyRes.headers['x-ttl']) res.setHeader('X-Ttl', proxyRes.headers['x-ttl']);
-
-      if (proxyRes.statusCode !== 200) {
-        if (proxyRes.statusCode === 429) {
-          return res.status(429).json({ success: false, error: 'ip-api.com 请求频率过高，请稍后再试' });
-        }
-        return res.status(502).json({ success: false, error: `ip-api.com 返回 HTTP ${proxyRes.statusCode}` });
-      }
-
+  // 首次尝试
+  doIpApiRequest(targetIP, res).then(data => res.json(data)).catch(async (err) => {
+    // 超时或网络错误则重试 1 次
+    if (err.status === 504 || (err.status === 502 && err.msg.includes('请求失败'))) {
       try {
-        res.json(JSON.parse(body));
-      } catch (e) {
-        res.status(502).json({ success: false, error: 'ip-api.com 响应解析失败' });
+        const data = await doIpApiRequest(targetIP, res);
+        return res.json(data);
+      } catch (e2) {
+        return res.status(e2.status || 502).json({ success: false, error: e2.msg });
       }
-    });
-  });
-
-  proxyReq.on('timeout', () => {
-    proxyReq.destroy();
-    res.status(504).json({ success: false, error: 'ip-api.com 请求超时' });
-  });
-
-  proxyReq.on('error', (e) => {
-    res.status(502).json({ success: false, error: `ip-api.com 请求失败: ${e.message}` });
+    }
+    return res.status(err.status || 502).json({ success: false, error: err.msg });
   });
 });
 
@@ -640,7 +660,7 @@ if (config.ssl && config.ssl.key && config.ssl.cert) {
 
 httpServer.listen(PORT, HOST, () => {
   console.log('==================================================');
-  console.log('  纯真IP库在线查询系统 v2.1.13 (模块化架构)');
+  console.log('  纯真IP库在线查询系统 v2.2.0 (模块化架构)');
   console.log('==================================================');
   console.log(`  服务地址:  http://${HOST}:${PORT}`);
   console.log(`  本地访问:  http://127.0.0.1:${PORT}`);

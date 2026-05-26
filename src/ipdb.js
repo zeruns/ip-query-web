@@ -35,28 +35,27 @@ let _ipdb = null;       // qqwry.ipdb reader (IPv6)
 let _ipdbPath = null;
 
 function getQqwry() {
-  let targetPath = DB_FILE_DAT;
-  if (!fs.existsSync(targetPath)) {
+  if (_qqwry && _qqwryPath === DB_FILE_DAT) return _qqwry;
+  if (!fs.existsSync(DB_FILE_DAT)) {
     throw new Error('IPv4 数据库文件未找到: data/qqwry.dat，请运行 npm install qqwry.ipdb 或等待自动更新');
   }
-  if (_qqwry && _qqwryPath === targetPath) return _qqwry;
   try {
-    _qqwry = new QQWry({ dataPath: targetPath });
-    _qqwryPath = targetPath;
+    _qqwry = new QQWry({ dataPath: DB_FILE_DAT });
+    _qqwryPath = DB_FILE_DAT;
     return _qqwry;
   } catch (e) {
-    throw new Error(`加载 IPv4 数据库失败 (${targetPath}): ${e.message}`);
+    throw new Error(`加载 IPv4 数据库失败 (${DB_FILE_DAT}): ${e.message}`);
   }
 }
 
 function getIpdb() {
+  if (_ipdb && _ipdbPath) return _ipdb;
+
   const localPath = DB_FILE_IPDB;
   const npmPath = path.join(path.dirname(NPM_DB_PATH), 'qqwry.ipdb');
   let targetPath = null;
   if (fs.existsSync(localPath)) targetPath = localPath;
   else if (fs.existsSync(npmPath)) targetPath = npmPath;
-
-  if (_ipdb && _ipdbPath === targetPath) return _ipdb;
   if (!targetPath) throw new Error('IPv6 数据库文件未找到。请运行 npm install qqwry.ipdb');
 
   try {
@@ -71,6 +70,7 @@ function getIpdb() {
 function reloadDatabase() {
   _qqwry = null; _qqwryPath = null;
   _ipdb = null; _ipdbPath = null;
+  clearQueryCache();
 }
 
 // ─── .dat 结果解析 ───
@@ -170,17 +170,45 @@ function queryIPv6(ip) {
 
 /**
  * 查询单个 IP 地址（自动检测 IPv4/IPv6 路由到对应数据库）
+ * 内置 LRU 缓存：1000 条，30 分钟 TTL
  */
+const queryCache = new Map();
+const QUERY_CACHE_MAX = 1000;
+const QUERY_CACHE_TTL = 30 * 60 * 1000; // 30 分钟
+
 function query(ip) {
   try {
-    if (net.isIPv6(ip)) {
-      return queryIPv6(ip);
-    } else {
-      return queryIPv4(ip);
+    // 检查缓存
+    const cached = queryCache.get(ip);
+    if (cached && Date.now() - cached.time < QUERY_CACHE_TTL) {
+      return cached.data;
     }
+
+    let result;
+    if (net.isIPv6(ip)) {
+      result = queryIPv6(ip);
+    } else {
+      result = queryIPv4(ip);
+    }
+
+    // 仅缓存成功结果
+    if (result.success) {
+      queryCache.set(ip, { data: result, time: Date.now() });
+      // LRU 淘汰：超出上限时删除最早条目
+      if (queryCache.size > QUERY_CACHE_MAX) {
+        const firstKey = queryCache.keys().next().value;
+        queryCache.delete(firstKey);
+      }
+    }
+    return result;
   } catch (e) {
     return { success: false, error: `查询出错: ${e.message}`, ip };
   }
+}
+
+// 清除查询缓存（数据库更新后调用）
+function clearQueryCache() {
+  queryCache.clear();
 }
 
 // ─── DNS 解析 ───
@@ -192,17 +220,19 @@ function isDomain(str) {
 
 function resolveWithPublicDNS(domain, recordType) {
   return new Promise((resolve, reject) => {
+    const TIMEOUT_MS = 5000; // 单次 DNS 查询超时
+
     dns.resolve(domain, recordType, (err, addrs) => {
       if (err) {
-        return tryResolveWithServers(domain, recordType, PUBLIC_DNS_SERVERS, 0)
+        return tryResolveWithServers(domain, recordType, PUBLIC_DNS_SERVERS, 0, TIMEOUT_MS)
           .then(resolve)
           .catch(() => {
-            tryResolveWithServers(domain, recordType, CN_DNS_SERVERS, 0)
+            tryResolveWithServers(domain, recordType, CN_DNS_SERVERS, 0, TIMEOUT_MS)
               .then(resolve)
               .catch(() => reject(new Error(`域名解析失败: ${domain}`)));
           });
       }
-      tryResolveWithServers(domain, recordType, PUBLIC_DNS_SERVERS, 0)
+      tryResolveWithServers(domain, recordType, PUBLIC_DNS_SERVERS, 0, TIMEOUT_MS)
         .then(remoteAddrs => {
           resolve([...new Set([...addrs, ...remoteAddrs])]);
         })
@@ -211,14 +241,28 @@ function resolveWithPublicDNS(domain, recordType) {
   });
 }
 
-function tryResolveWithServers(domain, recordType, servers, index) {
+function tryResolveWithServers(domain, recordType, servers, index, timeoutMs) {
   return new Promise((resolve, reject) => {
     if (index >= servers.length) return reject(new Error('所有DNS服务器均失败'));
     const resolver = new dns.Resolver();
     resolver.setServers([servers[index]]);
+    let done = false;
+
+    const timer = setTimeout(() => {
+      if (!done) {
+        done = true;
+        resolver.cancel ? resolver.cancel() : null;
+        tryResolveWithServers(domain, recordType, servers, index + 1, timeoutMs)
+          .then(resolve).catch(reject);
+      }
+    }, timeoutMs);
+
     resolver.resolve(domain, recordType, (err, addrs) => {
+      if (done) return;
+      done = true;
+      clearTimeout(timer);
       if (err || !addrs || addrs.length === 0) {
-        tryResolveWithServers(domain, recordType, servers, index + 1)
+        tryResolveWithServers(domain, recordType, servers, index + 1, timeoutMs)
           .then(resolve).catch(reject);
       } else {
         resolve(addrs);
@@ -396,6 +440,7 @@ module.exports = {
   resolveAll,
   isDomain,
   reloadDatabase,
+  clearQueryCache,
   formatLocationText,
   formatLocationTextSimple,
   getInfo
