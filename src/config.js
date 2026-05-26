@@ -34,8 +34,8 @@ const config = {
     burstWindow: parseInt(process.env.CC_BURST_WINDOW, 10) || 2000,
     // 窗口内最大新建连接数
     burstMax: parseInt(process.env.CC_BURST_MAX, 10) || 40,
-    // 慢速攻击超时（毫秒）
-    slowTimeout: parseInt(process.env.CC_SLOW_TIMEOUT, 10) || 15000,
+    // 慢速攻击超时（毫秒），DNS 解析最长可达 20s，需留余量
+    slowTimeout: parseInt(process.env.CC_SLOW_TIMEOUT, 10) || 30000,
     // 封禁时长（毫秒）
     blockDuration: parseInt(process.env.CC_BLOCK_DURATION, 10) || 60000,
     // IP 白名单（逗号分隔，永远放行）
@@ -68,7 +68,7 @@ const config = {
   // ─── 应用信息 ───
   app: {
     name: 'IP 归属地查询系统',
-    version: '2.2.3',
+    version: '2.2.4',
     description: '纯真IP库在线查询 - 支持IPv4/IPv6/域名解析',
   },
 };

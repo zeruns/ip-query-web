@@ -52,13 +52,26 @@ node server.js
 
 ### 方式二：Docker 部署
 
+**前提：** 已安装 Docker Engine 20.10+ 和 Docker Compose V2。
+
 ```bash
-# Docker Compose V2（Docker Desktop / Docker Engine 20.10+）
+# 1. 创建环境配置（必需！否则容器启动失败）
+cp .env.example .env
+
+# 2. 境内部署建议编辑 .env，改用国内 DNS 避免解析超时：
+#     PUBLIC_DNS=223.5.5.5,119.29.29.29
+
+# 3. 构建并启动
 docker compose up -d --build
 
-# Docker Compose V1（旧版，命令带横线）
-docker-compose up -d --build
+# 查看日志
+docker compose logs -f
+
+# 等待看到 "纯真IP库在线查询系统" 启动信息后访问 http://localhost:6688
 ```
+
+> **注意：** 首次启动时 IP 数据库可能为空，需手动触发更新或等待周一凌晨 3:00 自动更新。
+> **ARM64 支持：** `node:18-alpine` 多架构镜像原生支持 AMD64 / ARM64 / ARMv7。
 
 ### 方式三：宝塔面板
 
@@ -164,7 +177,7 @@ vim .env               # 按需修改
 | `CC_MAX_CONCURRENT` | `20` | 单 IP 最大并发连接数，超限自动封禁 |
 | `CC_BURST_WINDOW` | `2000` | 突发检测窗口（毫秒） |
 | `CC_BURST_MAX` | `40` | 窗口内最大新建连接数 |
-| `CC_SLOW_TIMEOUT` | `15000` | 慢速攻击超时（毫秒），超时未完成请求视为攻击 |
+| `CC_SLOW_TIMEOUT` | `30000` | 慢速攻击超时（毫秒），DNS 解析最长可达 20s 需留余量 |
 | `CC_BLOCK_DURATION` | `60000` | 自动封禁时长（毫秒），默认 60 秒 |
 | `CC_WHITELIST` | 空 | IP 白名单（逗号分隔），白名单内 IP 不受任何限制 |
 | `CC_BLACKLIST` | 空 | IP 黑名单（逗号分隔），永远拦截 |

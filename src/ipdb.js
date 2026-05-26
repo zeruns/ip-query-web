@@ -243,7 +243,7 @@ function isPrivateIP(ip) {
 
 function resolveWithPublicDNS(domain, recordType) {
   return new Promise((resolve, reject) => {
-    const TIMEOUT_MS = 5000; // 单次 DNS 查询超时
+    const TIMEOUT_MS = 3000; // 单次 DNS 查询超时
 
     dns.resolve(domain, recordType, (err, addrs) => {
       if (err) {

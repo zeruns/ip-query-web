@@ -56,16 +56,25 @@ node server.js
 
 ### 方式三：Docker 部署
 
-```bash
-# Docker Compose V2（Docker Desktop / Docker Engine 20.10+）
-docker compose up -d --build
+**前提：** Docker Engine 20.10+ + Docker Compose V2。支持 AMD64 / ARM64 / ARMv7。
 
-# Docker Compose V1（旧版，命令带横线）
-docker-compose up -d --build
+```bash
+# 1. 创建环境配置（必需！否则容器启动失败）
+cp .env.example .env
+
+# 2. 境内部署建议编辑 .env，改用国内 DNS：
+#     PUBLIC_DNS=223.5.5.5,119.29.29.29
+
+# 3. 构建并启动
+docker compose up -d --build
 
 # 查看日志
 docker compose logs -f
 ```
+
+> **首次启动：** IP 数据库可能为空，执行 `docker exec ip-query-web node src/updater.js update` 手动触发更新。
+> 
+> **docker exec 注意：** docker exec 新 shell 不自动加载挂载的 .env，如需手动执行命令并读取环境变量请加 `-e` 参数。
 
 ### 方式四：宝塔面板
 
@@ -125,7 +134,7 @@ node cli.js blog.zeruns.com
 | `CC_MAX_CONCURRENT` | `20` | 单 IP 最大并发连接数 |
 | `CC_BURST_WINDOW` | `2000` | 突发检测窗口（毫秒） |
 | `CC_BURST_MAX` | `40` | 窗口内最大新建连接数 |
-| `CC_SLOW_TIMEOUT` | `15000` | 慢速攻击超时（毫秒） |
+| `CC_SLOW_TIMEOUT` | `30000` | 慢速攻击超时（毫秒），DNS 解析最长可达 20s 需留余量 |
 | `CC_BLOCK_DURATION` | `60000` | 封禁时长（毫秒） |
 | `CC_WHITELIST` | 空 | IP 白名单（逗号分隔） |
 | `CC_BLACKLIST` | 空 | IP 黑名单（逗号分隔） |

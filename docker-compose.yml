@@ -1,5 +1,3 @@
-version: "3"
-
 services:
   ip-query-web:
     build: .
@@ -11,12 +9,12 @@ services:
     volumes:
       # IP 数据库文件持久化（更新后不丢失）
       - ./data:/app/data
-      # 环境变量配置（可选）
+      # 环境变量配置（部署前需先 cp .env.example .env）
       - ./.env:/app/.env:ro
     environment:
-      # 映射格式（兼容 V1 docker-compose）
       PORT: "6688"
       HOST: "::"
       TZ: "Asia/Shanghai"
       GITHUB_MIRROR: "https://gh-proxy.com/"
-    # 更多配置可通过挂载的 .env 文件或在此 environment 中设置
+      # 境内部署建议设置国内 DNS，避免解析超时
+      # PUBLIC_DNS: "223.5.5.5,119.29.29.29"

@@ -160,7 +160,7 @@ vim .env               # Edit as needed
 | `CC_MAX_CONCURRENT` | `20` | Max concurrent connections per IP, exceeded triggers auto-ban |
 | `CC_BURST_WINDOW` | `2000` | Burst detection window (milliseconds) |
 | `CC_BURST_MAX` | `40` | Max new connections within burst window |
-| `CC_SLOW_TIMEOUT` | `15000` | Slow attack timeout (ms), incomplete requests past this time treated as attacks |
+| `CC_SLOW_TIMEOUT` | `30000` | Slow attack timeout (ms), DNS resolution can take up to 20s |
 | `CC_BLOCK_DURATION` | `60000` | Auto-ban duration (ms), default 60 seconds |
 | `CC_WHITELIST` | empty | IP whitelist (comma-separated), whitelisted IPs are unrestricted |
 | `CC_BLACKLIST` | empty | IP blacklist (comma-separated), permanently blocked |
