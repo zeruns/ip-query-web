@@ -533,6 +533,48 @@ app.get('/api/stats', limiter, (req, res) => {
   });
 });
 
+// ── 11. GET /api/recommend/ip-api?q={ip} — ip-api.com 代理（HTTPS→HTTP 桥接）──
+// 免费版 ip-api.com 仅支持 HTTP，浏览器 HTTPS 页面会阻止混合内容
+// 此代理由服务端发起 HTTP 请求，避免浏览器混合内容拦截
+app.get('/api/recommend/ip-api', limiter, (req, res) => {
+  const q = (req.query.q || '').trim();
+  const apiPath = q ? `/json/${encodeURIComponent(q)}` : '/json/';
+  const apiUrl = `http://ip-api.com${apiPath}?lang=zh-CN`;
+
+  const proxyReq = http.get(apiUrl, { timeout: 8000 }, (proxyRes) => {
+    let body = '';
+    proxyRes.on('data', chunk => { body += chunk; });
+    proxyRes.on('end', () => {
+      // 转发限流头信息
+      if (proxyRes.headers['x-rl']) res.setHeader('X-Rl', proxyRes.headers['x-rl']);
+      if (proxyRes.headers['x-ttl']) res.setHeader('X-Ttl', proxyRes.headers['x-ttl']);
+
+      if (proxyRes.statusCode !== 200) {
+        if (proxyRes.statusCode === 429) {
+          return res.status(429).json({ success: false, error: 'ip-api.com 请求频率过高，请稍后再试' });
+        }
+        return res.status(proxyRes.statusCode).json({ success: false, error: `ip-api.com 返回 HTTP ${proxyRes.statusCode}` });
+      }
+
+      try {
+        const data = JSON.parse(body);
+        res.json(data);
+      } catch (e) {
+        res.json({ success: false, error: 'ip-api.com 响应解析失败' });
+      }
+    });
+  });
+
+  proxyReq.on('timeout', () => {
+    proxyReq.destroy();
+    res.status(504).json({ success: false, error: 'ip-api.com 请求超时' });
+  });
+
+  proxyReq.on('error', (e) => {
+    res.status(502).json({ success: false, error: `ip-api.com 代理请求失败: ${e.message}` });
+  });
+});
+
 // ── 健康检查 ──
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', uptime: process.uptime() });
@@ -584,7 +626,7 @@ if (config.ssl && config.ssl.key && config.ssl.cert) {
 
 httpServer.listen(PORT, HOST, () => {
   console.log('==================================================');
-  console.log('  纯真IP库在线查询系统 v2.1.6 (模块化架构)');
+  console.log('  纯真IP库在线查询系统 v2.1.7 (模块化架构)');
   console.log('==================================================');
   console.log(`  服务地址:  http://${HOST}:${PORT}`);
   console.log(`  本地访问:  http://127.0.0.1:${PORT}`);
@@ -600,6 +642,7 @@ httpServer.listen(PORT, HOST, () => {
   console.log('    GET /api/query?q=     - 综合查询(IP或域名)');
   console.log('    GET /api/info         - 数据库信息');
   console.log('    GET /api/status       - 数据库状态');
+  console.log('    GET /api/recommend/ip-api - ip-api.com 代理(HTTPS桥接)');
   console.log('  所有接口支持 JSON / .txt 纯文本双格式');
   console.log('==================================================');
   
