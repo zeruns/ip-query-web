@@ -46,11 +46,24 @@
 
 ## 第三方 API 调用约束
 
-**所有第三方 API 必须在客户端浏览器端直接调用，严禁通过服务端代理/中转。**
+**原则：所有第三方 API 查询优先在客户端浏览器端直接发起，禁止服务端中转暴露服务器公网 IP。**
 
-原因：服务端代理会暴露服务器公网 IP 给第三方服务，存在隐私和安全风险。
+### 例外：ip-api.com 服务端代理
 
-对于仅支持 HTTP 的第三方 API（如 ip-api.com 免费版），在 HTTPS 页面上因浏览器混合内容策略无法直接调用时，应在前端明确提示用户「该 API 仅支持 HTTP，无法在 HTTPS 页面调用」，引导用户访问官网，**不得添加服务端代理**。
+ip-api.com 免费版仅支持 HTTP，HTTPS 页面无法直接调用，故通过 `/api/recommend/ip-api` 代理。该代理满足"不暴露服务器 IP"条件：
+
+| 场景 | 代理逻辑 | 安全性 |
+|------|----------|--------|
+| 查自身 IP（无 q 参数） | `getClientIP(req)` 获取用户 IP → 转发给 ip-api | ip-api 响应 `query` = 用户 IP |
+| 查指定 IP（有 q 参数） | 直接转发 q 参数 | ip-api 响应 `query` = 用户提供的 IP |
+
+> 代理原则：只要最终响应中不包含服务器公网 IP，允许代理。
+
+### 第三方 API 列表约束
+
+- 本站 `/api/` 接口（纯真 IP 库）**不**列入第三方 API 对比列表
+- 仅支持查自身 IP 的 API（如 IPIP.NET）标记 `selfOnly: true`，手动输入 IP 时直接提示
+- HTTP-only 的 API 在 HTTPS 页面上前端提示不可用（`httpOnlyError`）
 
 ## 敏感信息保护
 
@@ -133,6 +146,21 @@ git push gitee master && git push github master
 | `tracking.js` | 统一统计代码（百度/Google/Cloudflare） |
 | `components/header.html` | 导航栏组件 |
 | `components/footer.html` | 页尾组件 |
+
+### 关键 API 路由
+
+| 路由 | 功能 | 限流 |
+|------|------|------|
+| `GET /api/myip` | 获取访问者 IP | 120次/分钟 |
+| `GET /api/location?q={ip}` | IP 查地理位置 | 120次/分钟 |
+| `GET /api/mylocation` | 获取访问者地理位置 | 120次/分钟 |
+| `GET /api/query?q={ip\|domain}` | 综合查询 | 30次/分钟 |
+| `GET /api/recommend/ip-api?q={ip}` | ip-api.com 代理（不暴露服务器 IP） | 120次/分钟 |
+| `GET /api/info` | 数据库信息 | 120次/分钟 |
+| `GET /api/status` | 数据库状态 | 120次/分钟 |
+| `GET /api/stats?range=daily\|weekly\|monthly\|yearly` | 网站统计 | 120次/分钟 |
+| `POST /api/batch` | 批量 IP 查询（≤50） | 120次/分钟 |
+| `GET /health` | 健康检查 | 无限制 |
 
 ### 语言文件
 

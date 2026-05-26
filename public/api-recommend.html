@@ -284,14 +284,17 @@ const API_SOURCES = [
     name: 'ipapi.is',
     url: ip => `https://api.ipapi.is/?q=${ip || ''}`,
     parse: d => ({
-      ip: d.ip, country: '', region: '', city: '',
-      isp: d.company?.name || '', org: d.datacenter?.datacenter || '',
-      lat: null, lon: null, timezone: null,
-      asn: d.asn?.asn, rir: d.rir,
-      is_proxy: d.is_proxy, is_vpn: d.is_vpn, is_tor: d.is_tor, is_datacenter: d.is_datacenter
+      ip: d.ip,
+      country: d.location?.country || '',
+      region: d.location?.state || '',
+      city: d.location?.city || '',
+      isp: d.company?.name || '',
+      org: d.asn?.org || '',
+      lat: d.location?.latitude, lon: d.location?.longitude,
+      timezone: d.location?.timezone || ''
     }),
     link: 'https://ipapi.is/',
-    doc: '免费 HTTPS 接口，侧重网络安全检测（代理/VPN/TOR/数据中心检测）。返回 JSON 格式，含 ASN/公司/滥用信息。'
+    doc: '免费 HTTPS 接口，无明确频率限制。返回 JSON 格式，含详细地理位置/ISP/ASN/安全检测（代理/VPN/TOR）。支持 IPv4/IPv6。'
   },
   {
     id: 'iplocate-io',
