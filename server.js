@@ -533,6 +533,48 @@ app.get('/api/stats', limiter, (req, res) => {
   });
 });
 
+// ── 11. GET /api/recommend/ip-api?q={ip} — ip-api.com 按 IP 查询（仅限指定 IP）──
+// 仅代理指定 IP 的查询（查询结果中 query 字段为用户提供的 IP，不暴露服务器公网 IP）
+// 不支持空参数查询自身 IP，防止暴露服务器 IP 给第三方
+app.get('/api/recommend/ip-api', limiter, (req, res) => {
+  const q = (req.query.q || '').trim();
+  if (!q || !net.isIP(q)) {
+    return res.status(400).json({ success: false, error: '请提供有效的 IP 地址参数 ?q={ip}（该接口仅支持指定 IP 查询，不支持查询自身 IP）' });
+  }
+  const apiUrl = `http://ip-api.com/json/${encodeURIComponent(q)}?lang=zh-CN`;
+
+  const proxyReq = http.get(apiUrl, { timeout: 8000 }, (proxyRes) => {
+    let body = '';
+    proxyRes.on('data', chunk => { body += chunk; });
+    proxyRes.on('end', () => {
+      if (proxyRes.headers['x-rl']) res.setHeader('X-Rl', proxyRes.headers['x-rl']);
+      if (proxyRes.headers['x-ttl']) res.setHeader('X-Ttl', proxyRes.headers['x-ttl']);
+
+      if (proxyRes.statusCode !== 200) {
+        if (proxyRes.statusCode === 429) {
+          return res.status(429).json({ success: false, error: 'ip-api.com 请求频率过高，请稍后再试' });
+        }
+        return res.status(502).json({ success: false, error: `ip-api.com 返回 HTTP ${proxyRes.statusCode}` });
+      }
+
+      try {
+        res.json(JSON.parse(body));
+      } catch (e) {
+        res.status(502).json({ success: false, error: 'ip-api.com 响应解析失败' });
+      }
+    });
+  });
+
+  proxyReq.on('timeout', () => {
+    proxyReq.destroy();
+    res.status(504).json({ success: false, error: 'ip-api.com 请求超时' });
+  });
+
+  proxyReq.on('error', (e) => {
+    res.status(502).json({ success: false, error: `ip-api.com 请求失败: ${e.message}` });
+  });
+});
+
 // ── 健康检查 ──
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', uptime: process.uptime() });
@@ -584,7 +626,7 @@ if (config.ssl && config.ssl.key && config.ssl.cert) {
 
 httpServer.listen(PORT, HOST, () => {
   console.log('==================================================');
-  console.log('  纯真IP库在线查询系统 v2.1.8 (模块化架构)');
+  console.log('  纯真IP库在线查询系统 v2.1.9 (模块化架构)');
   console.log('==================================================');
   console.log(`  服务地址:  http://${HOST}:${PORT}`);
   console.log(`  本地访问:  http://127.0.0.1:${PORT}`);
@@ -600,6 +642,7 @@ httpServer.listen(PORT, HOST, () => {
   console.log('    GET /api/query?q=     - 综合查询(IP或域名)');
   console.log('    GET /api/info         - 数据库信息');
   console.log('    GET /api/status       - 数据库状态');
+  console.log('    GET /api/recommend/ip-api - ip-api.com 指定IP查询');
   console.log('  所有接口支持 JSON / .txt 纯文本双格式');
   console.log('==================================================');
   

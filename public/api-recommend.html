@@ -250,13 +250,13 @@ const API_SOURCES = [
     id: 'ip-api',
     name: 'ip-api.com',
     httpOnly: true,
-    url: ip => `http://ip-api.com/json/${ip ? ip : ''}?lang=zh-CN`,
+    url: ip => ip ? `/api/recommend/ip-api?q=${ip}` : `http://ip-api.com/json/?lang=zh-CN`,
     parse: d => ({
       ip: d.query, country: d.country, region: d.regionName, city: d.city,
       isp: d.isp, org: d.org, lat: d.lat, lon: d.lon, timezone: d.timezone
     }),
     link: 'https://ip-api.com/',
-    doc: '无需注册，免费调用。限制：45次/分钟。免费版仅支持 HTTP，HTTPS 页面因浏览器安全策略无法直接调用。'
+    doc: '无需注册，免费调用。限制：45次/分钟。指定 IP 查询时通过服务端中转（不暴露服务器 IP）。免费版仅支持 HTTP，查询自身 IP 需客户端直接调用，HTTPS 页面不可用。'
   },
   {
     id: 'ip-sb',
@@ -327,18 +327,6 @@ const API_SOURCES = [
     }),
     link: 'https://ipinfo.io/',
     doc: '免费用户每日 50,000 次。需注册 Token（可选）。返回详细地理/ASN/运营商信息，含坐标和时区。'
-  },
-  {
-    id: 'local',
-    name: '本站 (纯真IP库)',
-    url: ip => `/api/location?q=${ip}`,
-    parse: d => ({
-      ip: d.ip, country: d.country, region: d.region, city: d.city,
-      isp: d.isp, org: d.owner, lat: null, lon: null, timezone: null,
-      district: d.district
-    }),
-    link: '/',
-    doc: '基于纯真 IP 数据库 (qqwry.ipdb)，本地查询无频率限制。支持 IPv4/IPv6，不暴露公网 IP 给第三方。'
   }
 ];
 
@@ -414,8 +402,8 @@ async function querySingleAPI(src) {
     renderError(src.id, __t('apiRecommend.selfOnlyError'));
     return;
   }
-  // 若当前页面为 HTTPS 但该 API 仅支持 HTTP，直接提示
-  if (src.httpOnly && location.protocol === 'https:') {
+  // 若当前页面为 HTTPS 但该 API 仅支持 HTTP 且无指定 IP，直接提示
+  if (src.httpOnly && !currentIP && location.protocol === 'https:') {
     setStatus(src.id, 'error', '❌ ' + __t('apiRecommend.fail'));
     renderError(src.id, __t('apiRecommend.httpOnlyError'));
     return;
