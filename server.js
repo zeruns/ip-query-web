@@ -27,9 +27,9 @@ const stats = require('./src/stats');
 // ──────────── 配置 ────────────
 const app = express();
 
-// 信任代理 — CDN + Nginx 场景必须设为 true
-// getClientIP() 优先从 CDN 专用头获取真实 IP，安全无虞
-app.set('trust proxy', true);
+// 仅信任本机 Nginx 反代（localhost），防止 IP 伪造
+const TRUSTED_PROXY = process.env.TRUSTED_PROXY || 'loopback';
+app.set('trust proxy', TRUSTED_PROXY);
 
 const PORT = config.port;
 const HOST = config.host;
@@ -62,12 +62,38 @@ const dnsLimiter = rateLimit({
   keyGenerator: rateLimitKey
 });
 
+// ──────────── 安全中间件（必须最先执行） ────────────
+
+// 反 IP 伪造：非可信代理来源剥离 CDN 头，防止限流/CC 防护被绕过
+app.use((req, res, next) => {
+  const remoteIp = req.socket?.remoteAddress || '';
+  const isLoopback = remoteIp === '127.0.0.1' || remoteIp === '::1' || remoteIp === '::ffff:127.0.0.1';
+  const isTrusted = isLoopback || (TRUSTED_PROXY !== 'loopback' && remoteIp && app.get('trust proxy') !== false);
+  if (!isTrusted) {
+    // 非可信来源：剥离所有可能被伪造的代理头
+    delete req.headers['x-forwarded-for'];
+    delete req.headers['x-real-ip'];
+    delete req.headers['cf-connecting-ip'];
+    delete req.headers['true-client-ip'];
+    delete req.headers['ali-real-client-ip'];
+    delete req.headers['ali-cdn-real-ip'];
+  }
+  next();
+});
+
 // 安全头中间件
 app.use((req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'DENY');
-  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('X-XSS-Protection', '0');  // 现代浏览器已废弃，显式禁用
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('X-Permitted-Cross-Domain-Policies', 'none');
+  // Content-Security-Policy（inline style 因全站 CSS 内联，需 unsafe-inline）
+  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
+  // HSTS：仅 HTTPS 场景生效（Nginx SSL 终端时由 Nginx 设置更合适）
+  if (config.ssl && config.ssl.key && config.ssl.cert) {
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  }
   next();
 });
 
@@ -660,7 +686,7 @@ if (config.ssl && config.ssl.key && config.ssl.cert) {
 
 httpServer.listen(PORT, HOST, () => {
   console.log('==================================================');
-  console.log('  纯真IP库在线查询系统 v2.2.0 (模块化架构)');
+  console.log('  纯真IP库在线查询系统 v2.2.1 (模块化架构)');
   console.log('==================================================');
   console.log(`  服务地址:  http://${HOST}:${PORT}`);
   console.log(`  本地访问:  http://127.0.0.1:${PORT}`);

@@ -215,7 +215,30 @@ function clearQueryCache() {
 
 function isDomain(str) {
   if (!str || net.isIP(str)) return false;
-  return /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}$/.test(str);
+  if (!/^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}$/.test(str)) return false;
+  // 屏蔽已知 DNS rebinding 域名
+  if (/\.(xip|nip|sslip)\.io$/i.test(str)) return false;
+  if (/\.(local|internal|corp|lan|home)$/i.test(str)) return false;
+  if (str === 'localtest.me' || str.endsWith('.localtest.me')) return false;
+  return true;
+}
+
+// 检测私有/保留 IP（DNS 解析结果过滤用）
+function isPrivateIP(ip) {
+  if (net.isIPv4(ip)) {
+    const parts = ip.split('.').map(Number);
+    return parts[0] === 10 ||
+      (parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31) ||
+      (parts[0] === 192 && parts[1] === 168) ||
+      parts[0] === 127 ||
+      parts[0] === 0 ||
+      (parts[0] === 169 && parts[1] === 254) ||
+      (parts[0] === 100 && parts[1] >= 64 && parts[1] <= 127);
+  }
+  if (net.isIPv6(ip)) {
+    return ip === '::1' || ip.startsWith('fc') || ip.startsWith('fd') || ip.startsWith('fe80');
+  }
+  return false;
 }
 
 function resolveWithPublicDNS(domain, recordType) {
@@ -321,8 +344,8 @@ async function queryWithResolve(input) {
 
   if (isDomain(input)) {
     const records = await resolveAll(input);
-    const v4Addrs = records.find(r => r.type === 'IPv4').addrs || [];
-    const v6Addrs = records.find(r => r.type === 'IPv6').addrs || [];
+    const v4Addrs = (records.find(r => r.type === 'IPv4').addrs || []).filter(ip => !isPrivateIP(ip));
+    const v6Addrs = (records.find(r => r.type === 'IPv6').addrs || []).filter(ip => !isPrivateIP(ip));
     const allAddrs = [...v4Addrs, ...v6Addrs];
 
     if (allAddrs.length === 0) {
@@ -439,6 +462,7 @@ module.exports = {
   resolveIPv6,
   resolveAll,
   isDomain,
+  isPrivateIP,
   reloadDatabase,
   clearQueryCache,
   formatLocationText,
