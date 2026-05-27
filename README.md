@@ -366,6 +366,10 @@ IP 地理位置数据来自 [纯真 IP 库 (CZ88.NET)](https://github.com/nmglia
 
 [Zeruns's Blog](https://blog.zeruns.com/)
 
+## 交流群
+
+**站长交流群：[767557452](https://jq.qq.com/?_wv=1027&k=wgSx4AYc)**
+
 ## VPS/云服务器推荐
 
 需要服务器部署本项目？可参考以下推荐：
