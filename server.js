@@ -88,9 +88,33 @@ app.use((req, res, next) => {
   res.setHeader('X-XSS-Protection', '0');  // 现代浏览器已废弃，显式禁用
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.setHeader('X-Permitted-Cross-Domain-Policies', 'none');
-  // Content-Security-Policy（inline style 因全站 CSS 内联，需 unsafe-inline）
-  // script-src 允许 CDN 加载 Chart.js 和统计脚本
-  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://hm.baidu.com https://www.googletagmanager.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
+  // Content-Security-Policy
+  // script-src: CDN (Chart.js) + 统计脚本 + 自身内联脚本
+  // img-src: 统计追踪像素（new Image()）需要外部域名
+  // 如需添加其他统计/广告域名，在此处追加：
+  //   环境变量 CSP_EXTRA_SCRIPT / CSP_EXTRA_IMG / CSP_EXTRA_CONNECT
+  const cspExtraScript = (process.env.CSP_EXTRA_SCRIPT || '').split(',').filter(Boolean);
+  const cspExtraImg = (process.env.CSP_EXTRA_IMG || '').split(',').filter(Boolean);
+  const cspExtraConnect = (process.env.CSP_EXTRA_CONNECT || '').split(',').filter(Boolean);
+  const cspScript = ['\'self\'', '\'unsafe-inline\'',
+    'https://cdn.jsdelivr.net',   // Chart.js
+    'https://hm.baidu.com',        // 百度统计
+    'https://www.googletagmanager.com',  // Google Analytics
+    'https://static.cloudflareinsights.com', // Cloudflare Analytics
+    ...cspExtraScript
+  ].join(' ');
+  const cspImg = ['\'self\'', 'data:',
+    'https://hm.baidu.com',        // 百度统计追踪像素
+    'https://www.googletagmanager.com',
+    'https://static.cloudflareinsights.com',
+    ...cspExtraImg
+  ].join(' ');
+  const cspConnect = ['\'self\'', 'https:',
+    ...cspExtraConnect
+  ].join(' ');
+  res.setHeader('Content-Security-Policy',
+    `default-src 'self'; script-src ${cspScript}; style-src 'self' 'unsafe-inline'; img-src ${cspImg}; connect-src ${cspConnect}; frame-ancestors 'none'; base-uri 'self'; form-action 'self'`
+  );
   // HSTS：仅 HTTPS 场景生效（Nginx SSL 终端时由 Nginx 设置更合适）
   if (config.ssl && config.ssl.key && config.ssl.cert) {
     res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
@@ -687,7 +711,7 @@ if (config.ssl && config.ssl.key && config.ssl.cert) {
 
 httpServer.listen(PORT, HOST, () => {
   console.log('==================================================');
-  console.log('  纯真IP库在线查询系统 v2.2.4 (模块化架构)');
+  console.log('  纯真IP库在线查询系统 v2.2.5 (模块化架构)');
   console.log('==================================================');
   console.log(`  服务地址:  http://${HOST}:${PORT}`);
   console.log(`  本地访问:  http://127.0.0.1:${PORT}`);

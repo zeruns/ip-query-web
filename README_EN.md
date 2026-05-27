@@ -224,7 +224,20 @@ The system has built-in three-layer protection, ready for public deployment:
 |:---:|------|------|
 | 1 | CC Protection (pure Node) | Connection limiting + burst detection + slow attack defense + auto-ban + IP whitelist/blacklist |
 | 2 | express-rate-limit | Tiered rate limiting by endpoint type (standard / DNS resolution) |
-| 3 | Security Headers | `X-Frame-Options`, `X-XSS-Protection`, `X-Content-Type-Options`, `Referrer-Policy`, CORS |
+| 3 | Security Headers + CSP | X-Frame-Options, CSP (script/img/connect-src), HSTS, Referrer-Policy, CORS |
+
+### CSP Custom Domains
+
+By default, Baidu Analytics, Google Analytics, Cloudflare, and jsDelivr CDN are allowed to load scripts and tracking pixels. To add other third-party services, set in `.env`:
+
+```bash
+# Allow JS loading from additional domains (comma-separated)
+CSP_EXTRA_SCRIPT=https://sdk.example.com
+# Allow images/tracking pixels from additional domains
+CSP_EXTRA_IMG=https://analytics.example.com
+# Allow fetch/XHR connections from additional domains
+CSP_EXTRA_CONNECT=https://api.example.com
+```
 
 ## Nginx Reverse Proxy
 

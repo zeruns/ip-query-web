@@ -241,7 +241,20 @@ CC_BLOCK_DURATION=30000
 |:---:|------|------|
 | 1 | CC 防护（纯 Node） | 并发限制 + 突发检测 + 慢速攻击防御 + 自动封禁 + IP 黑白名单 |
 | 2 | express-rate-limit | 按接口类型分级限流（普通 / DNS 解析） |
-| 3 | 安全头 | `X-Frame-Options`、`X-XSS-Protection`、`X-Content-Type-Options`、`Referrer-Policy`、`CORS` 控制 |
+| 3 | 安全头 + CSP | X-Frame-Options、CSP（script/img/connect-src）、HSTS、Referrer-Policy、CORS 控制 |
+
+### CSP 自定义域名
+
+系统默认已允许百度统计、Google Analytics、Cloudflare、jsDelivr CDN 加载脚本和追踪像素。如需添加其他第三方服务域名，在 `.env` 中设置：
+
+```bash
+# 允许加载 JS 的域名（逗号分隔）
+CSP_EXTRA_SCRIPT=https://sdk.example.com
+# 允许加载图片/追踪像素的域名
+CSP_EXTRA_IMG=https://analytics.example.com
+# 允许 fetch/XHR 连接的域名
+CSP_EXTRA_CONNECT=https://api.example.com
+```
 
 ## Nginx 反向代理
 
